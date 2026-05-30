@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>손끝 한글 : 훈맹정음 탐험대</title>
     <style>
         /* --- 1. 기본 테마 및 반응형 레이아웃 설정 --- */
@@ -26,23 +26,24 @@
         }
 
         body, html {
-            margin: 0; padding: 0; width: 100%; height: 100%;
+            margin: 0; padding: 0; width: 100%; min-height: 100%;
             background-color: var(--bg); color: #3e3a35;
-            display: flex; align-items: center; justify-content: center;
-            overflow: hidden;
+            display: flex; flex-direction: column;
+            overflow-x: hidden;
         }
 
         #app-container {
-            width: 100vw; height: 100vh;
+            width: 100%; min-height: 100vh;
             display: flex; flex-direction: column;
-            position: relative; overflow: hidden;
+            position: relative;
         }
 
         /* 공통 화면 스타일 */
         .screen {
-            display: none; width: 100%; height: 100%; padding: 4vh 4vw;
+            display: none; width: 100%; min-height: 100vh; padding: 40px 20px;
             flex-direction: column; align-items: center;
             animation: fadeIn 0.4s ease-out;
+            overflow-y: auto;
         }
         @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
         .screen.active { display: flex; }
