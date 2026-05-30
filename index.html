@@ -144,7 +144,13 @@
         }
         /* 잔상 점자 (Ghost) */
         .dot.dot-ghost {
-            background-color: var(--dot-ghost); color: rgba(0,0,0,0.1);
+            background-color: var(--dot-ghost); 
+            color: rgba(0,0,0,0.1);
+            animation: ghostFlicker 1.5s infinite alternate;
+        }
+        @keyframes ghostFlicker {
+            0% { opacity: 0.3; transform: scale(0.98); }
+            100% { opacity: 1; transform: scale(1.02); }
         }
         /* 깜빡이는 코칭 가이드 */
         .dot.coach-highlight {
@@ -499,10 +505,8 @@
                     // 고스트 중 타겟에 없는것만 순수 고스트로 렌더링 (사라질 예정)
                     d.classList.add('dot-ghost');
                 } else if (ghost.includes(n) && target.includes(n)) {
-                     // 타겟에도 있고 고스트에도 있으면 미리 켜진 고스트 상태 부여
+                     // 타겟에도 있고 고스트에도 있으면 고스트 상태 부여 (자동 활성화 배제)
                      d.classList.add('dot-ghost');
-                     state.activeDots.add(n); // 자동 활성화
-                     d.classList.add('active');
                 }
             });
 
