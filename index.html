@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>손끝 한글 : 훈맹정음 탐험대</title>
+    <style>
+        /* --- 1. 기본 테마 및 반응형 레이아웃 설정 --- */
+        :root {
+            --primary: #e76f51;
+            --secondary: #8c7a6b;
+            --bg: #fdfaf5;
+            --white: #ffffff;
+            --dot-off: #e3ddd3;
+            --dot-on: linear-gradient(145deg, #ffdf7a, #fca311);
+            --shadow: 0 10px 30px rgba(0,0,0,0.08);
+            --font-size-base: clamp(16px, 2vw, 24px);
+        }
+
+        * {
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            font-family: 'Pretendard', system-ui, -apple-system, sans-serif;
+        }
+
+        body, html {
+            margin: 0; padding: 0; width: 100%; height: 100%;
+            background-color: var(--bg); color: #3e3a35;
+            display: flex; align-items: center; justify-content: center;
+            overflow: hidden;
+        }
+
+        #app-container {
+            width: 100vw; height: 100vh;
+            display: flex; flex-direction: column;
+            position: relative; overflow: hidden;
+        }
+
+        /* 공통 화면 스타일 */
+        .screen {
+            display: none; width: 100%; height: 100%; padding: 4vh 4vw;
+            flex-direction: column; align-items: center;
+            animation: fadeIn 0.4s ease-out;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: scale(0.98); } to { opacity: 1; transform: scale(1); } }
+        .screen.active { display: flex; }
+
+        /* 타이틀 및 텍스트 */
+        h1 { font-size: clamp(24px, 4vw, 40px); color: #4a3e3d; margin: 0 0 10px 0; text-align: center; word-break: keep-all; }
+        p { font-size: clamp(16px, 2vw, 22px); line-height: 1.6; color: #605553; text-align: center; margin: 5px 0; word-break: keep-all; }
+
+        /* 버튼 시스템 */
+        .btn {
+            background-color: var(--secondary); color: white; border: none;
+            padding: 15px 40px; font-size: clamp(18px, 2vw, 24px); font-weight: bold;
+            border-radius: 50px; cursor: pointer; box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+            transition: all 0.2s;
+        }
+        .btn:active { transform: scale(0.95); box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+        .btn-sub { background-color: #d1c7bd; color: #4a3e3d; }
+        .btn-success { background-color: var(--primary); animation: bounce 2s infinite; }
+        .btn-hint { background-color: #fca311; color: white; border-radius: 15px; border: none; padding: 10px 20px; font-size: 18px; cursor: pointer; }
+
+        /* --- 2. 메인 메뉴 (반응형 Grid) --- */
+        .menu-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;
+            width: 100%; max-width: 1000px; margin: auto;
+        }
+        .menu-card {
+            background: var(--white); border-radius: 30px; padding: 30px;
+            text-align: center; box-shadow: var(--shadow); cursor: pointer;
+            transition: 0.3s; border: 4px solid transparent; position: relative;
+        }
+        .menu-card:hover { transform: translateY(-5px); }
+        .menu-card.completed { border-color: var(--primary); background: #fffaf9; }
+        .menu-card.locked { opacity: 0.6; cursor: default; background: #eee; }
+        .menu-card .icon { font-size: 50px; display: block; margin-bottom: 10px; }
+        .menu-card .title { font-size: 22px; font-weight: bold; }
+        .stamp {
+            position: absolute; top: -10px; right: -10px; font-size: 18px;
+            background: var(--primary); padding: 5px 15px; border-radius: 15px; color: white;
+            font-weight: bold; transform: rotate(15deg); display: none;
+        }
+        .menu-card.completed .stamp { display: block; }
+
+        /* --- 3. 탐험/조작 구역 (Landscape/Portrait 대응) --- */
+        .main-activity-layout {
+            display: flex; width: 100%; flex: 1; gap: 30px; margin-top: 20px;
+        }
+
+        /* 가로 모드 기본 */
+        @media (orientation: landscape) {
+            .main-activity-layout { flex-direction: row; }
+            .left-panel { flex: 1.2; display: flex; flex-direction: column; justify-content: center; }
+            .right-panel { flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+        }
+
+        /* 세로 모드 대응 */
+        @media (orientation: portrait) {
+            .main-activity-layout { flex-direction: column; }
+            .left-panel { flex: 0.8; width: 100%; display: flex; flex-direction: column; align-items: center; }
+            .right-panel { flex: 1.2; width: 100%; display: flex; align-items: center; justify-content: center; }
+        }
+
+        .info-box {
+            background: var(--white); border-radius: 30px; padding: 30px; width: 100%;
+            box-shadow: var(--shadow); text-align: center;
+        }
+        .coach-box {
+            background: #fff9f0; border: 3px solid var(--primary); border-radius: 20px;
+            padding: 15px; width: 100%; min-height: 80px; display: flex; align-items: center; justify-content: center;
+            font-size: clamp(18px, 1.5vw, 24px); font-weight: bold; margin-bottom: 15px;
+        }
+        .target-display { font-size: clamp(80px, 10vh, 140px); font-weight: 900; color: var(--primary); line-height: 1; margin: 10px 0; }
+        .rule-desc { font-size: 18px; color: var(--secondary); font-weight: bold; background: #f0ede9; padding: 10px 20px; border-radius: 15px; width: 100%; }
+
+        /* 대형 점자판 (Egg Carton) */
+        .braille-container {
+            background: #e8ded3; border-radius: 40px; padding: 4vw; width: fit-content;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.1);
+        }
+        .braille-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2.5vh 5vw; }
+        .dot {
+            width: clamp(70px, 12vh, 110px); height: clamp(70px, 12vh, 110px);
+            background-color: var(--dot-off); border-radius: 50%;
+            box-shadow: inset 0 -6px 8px rgba(0,0,0,0.1), inset 0 6px 8px rgba(255,255,255,0.4);
+            display: flex; align-items: center; justify-content: center;
+            font-size: 22px; font-weight: 900; color: rgba(0,0,0,0.1);
+            cursor: pointer; transition: all 0.2s; position: relative;
+        }
+        .dot.active {
+            background: var(--dot-on); color: #4a3e3d;
+            box-shadow: 0 0 25px rgba(252, 163, 17, 0.5), 0 8px 15px rgba(0,0,0,0.2);
+            transform: scale(1.05) translateY(-5px);
+        }
+        .dot.coach-highlight { animation: coachPulse 0.8s infinite alternate; border: 5px solid var(--primary); }
+        @keyframes coachPulse { 0% { transform: scale(1); } 100% { transform: scale(1.1); background: var(--primary); color: white; } }
+
+        /* 진행도 */
+        .progress-container { width: 100%; height: 12px; background: #e0d9d0; border-radius: 10px; margin-bottom: 10px; overflow: hidden; }
+        .progress-bar { height: 100%; background: var(--primary); width: 0%; transition: width 0.3s; }
+
+        /* --- 4. 단어 풀어쓰기 UI --- */
+        .word-tabs { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; justify-content: center; }
+        .word-tab { padding: 8px 15px; background: #ebdccb; border-radius: 12px; font-weight: bold; cursor: pointer; }
+        .word-tab.active { background: var(--primary); color: white; }
+
+        @keyframes bounce { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <div id="app-container">
+        <!-- [1] 웰컴 화면 -->
+        <div id="welcome-screen" class="screen active">
+            <div style="text-align: center; margin: auto 0;">
+                <div style="font-size: 80px; margin-bottom: 20px;">🔍✨</div>
+                <h1>손끝 한글 : 훈맹정음 탐험대</h1>
+                <p>박두성 선생님의 마법 같은 6점자 규칙!<br>과학적인 한글 점자의 비밀을 찾으러 가볼까요?</p>
+            </div>
+            <button class="btn btn-success" onclick="startApp()">탐험 시작하기!</button>
+        </div>
+
+        <!-- [2] 메인 메뉴 -->
+        <div id="menu-screen" class="screen">
+            <h1>탐험 지도를 따라가요</h1>
+            <p>모든 구역을 완료해 스탬프 3개를 모으면 암호실이 열려요!</p>
+            <div class="menu-grid">
+                <div class="menu-card" id="card-cho" onclick="goModule('cho')">
+                    <div class="stamp">참 잘했어요!</div>
+                    <span class="icon">⚡</span>
+                    <div class="title">자음 탐험 구역</div>
+                </div>
+                <div class="menu-card" id="card-jung" onclick="goModule('jung')">
+                    <div class="stamp">참 잘했어요!</div>
+                    <span class="icon">🌈</span>
+                    <div class="title">모음 탐험 구역</div>
+                </div>
+                <div class="menu-card" id="card-jong" onclick="goModule('jong')">
+                    <div class="stamp">참 잘했어요!</div>
+                    <span class="icon">🚀</span>
+                    <div class="title">받침 탐험 구역</div>
+                </div>
+                <div class="menu-card locked" id="card-final" onclick="goFinal()">
+                    <span class="icon" id="final-lock">🔒</span>
+                    <div class="title">최종 암호 해독실</div>
+                </div>
+            </div>
+            <button class="btn btn-sub" style="margin-top: 20px;" onclick="changeScreen('welcome-screen')">메인 화면으로</button>
+        </div>
+
+        <!-- [3] 원리 설명 화면 -->
+        <div id="principle-screen" class="screen">
+            <h1 id="p-title">원리 설명</h1>
+            <div class="main-activity-layout">
+                <div class="left-panel">
+                    <div class="info-box">
+                        <h2 id="p-subtitle" style="color: var(--primary);">규칙의 비밀</h2>
+                        <p id="p-desc" style="text-align: left;"></p>
+                    </div>
+                </div>
+                <div class="right-panel">
+                    <div class="braille-container">
+                        <div class="braille-grid" id="viz-grid">
+                            <div class="dot v-dot">1</div><div class="dot v-dot">4</div>
+                            <div class="dot v-dot">2</div><div class="dot v-dot">5</div>
+                            <div class="dot v-dot">3</div><div class="dot v-dot">6</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-success" style="margin-top: 20px;" onclick="startExploration()">본격 탐험 시작!</button>
+        </div>
+
+        <!-- [4] 탐험 조작방 -->
+        <div id="explore-screen" class="screen">
+            <div class="progress-container"><div class="progress-bar" id="e-pbar"></div></div>
+            <h1 id="e-title">탐험 중</h1>
+            <div class="main-activity-layout">
+                <div class="left-panel">
+                    <div class="coach-box" id="e-coach">가이드를 따라 불을 켜보세요!</div>
+                    <div class="info-box">
+                        <div id="e-char-label" style="font-size: 20px; font-weight: bold; color: var(--secondary);">현재 글자</div>
+                        <div class="target-display" id="e-target">-</div>
+                        <div class="rule-desc" id="e-rule">규칙 설명</div>
+                    </div>
+                </div>
+                <div class="right-panel">
+                    <div class="braille-container">
+                        <div class="braille-grid">
+                            <div class="dot e-dot" data-dot="1" onclick="tapDot(1)">1</div><div class="dot e-dot" data-dot="4" onclick="tapDot(4)">4</div>
+                            <div class="dot e-dot" data-dot="2" onclick="tapDot(2)">2</div><div class="dot e-dot" data-dot="5" onclick="tapDot(5)">5</div>
+                            <div class="dot e-dot" data-dot="3" onclick="tapDot(3)">3</div><div class="dot e-dot" data-dot="6" onclick="tapDot(6)">6</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div style="display: flex; gap: 20px; width: 100%; justify-content: space-between; margin-top: 20px;">
+                <button class="btn btn-sub" onclick="changeScreen('menu-screen')">탐험 지도로 돌아가기</button>
+                <button class="btn btn-success hidden" id="e-next-btn" onclick="nextStep()">미션 성공! 다음으로 ➔</button>
+            </div>
+        </div>
+
+        <!-- [5] 퀴즈 화면 -->
+        <div id="quiz-screen" class="screen">
+            <h1>진정한 탐험가 확인 퀴즈</h1>
+            <div class="main-activity-layout">
+                <div class="left-panel">
+                    <div class="info-box">
+                        <p id="q-text">이 점자는 무엇일까요?</p>
+                        <button class="btn-hint" onmousedown="showHint(true)" onmouseup="showHint(false)" ontouchstart="showHint(true)" ontouchend="showHint(false)">꾹 눌러서 힌트 보기 💡</button>
+                        <div id="q-options" style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px;"></div>
+                    </div>
+                </div>
+                <div class="right-panel">
+                    <div class="braille-container">
+                        <div class="braille-grid">
+                            <div class="dot q-dot">1</div><div class="dot q-dot">4</div>
+                            <div class="dot q-dot">2</div><div class="dot q-dot">5</div>
+                            <div class="dot q-dot">3</div><div class="dot q-dot">6</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <button class="btn btn-sub" style="margin-top: 20px;" onclick="changeScreen('menu-screen')">탐험 지도로 돌아가기</button>
+        </div>
+
+        <!-- [6] 최종 암호 해독실 -->
+        <div id="final-screen" class="screen">
+            <h1>최종 암호 해독실</h1>
+            <div id="topic-select" class="menu-grid">
+                <!-- 주제 버튼들 -->
+            </div>
+            <div id="final-game" class="hidden" style="width: 100%; height: 100%; display: flex; flex-direction: column;">
+                <div class="main-activity-layout">
+                    <div class="left-panel">
+                        <div class="coach-box">단어 전체를 점자로 완성하세요!</div>
+                        <div class="info-box">
+                            <div class="word-tabs" id="f-tabs"></div>
+                            <div class="target-display" id="f-char">-</div>
+                            <button class="btn-hint" onmousedown="showHint(true)" onmouseup="showHint(false)" ontouchstart="showHint(true)" ontouchend="showHint(false)">힌트 보기 💡</button>
+                        </div>
+                    </div>
+                    <div class="right-panel">
+                        <div class="braille-container">
+                            <div class="braille-grid">
+                                <div class="dot f-dot" data-dot="1" onclick="tapFinalDot(1)">1</div><div class="dot f-dot" data-dot="4" onclick="tapFinalDot(4)">4</div>
+                                <div class="dot f-dot" data-dot="2" onclick="tapFinalDot(2)">2</div><div class="dot f-dot" data-dot="5" onclick="tapFinalDot(5)">5</div>
+                                <div class="dot f-dot" data-dot="3" onclick="tapFinalDot(3)">3</div><div class="dot f-dot" data-dot="6" onclick="tapFinalDot(6)">6</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div style="display: flex; gap: 20px; width: 100%; justify-content: space-between; margin-top: 20px;">
+                    <button class="btn btn-sub" onclick="exitFinal()">그만하기</button>
+                    <button class="btn btn-success" onclick="submitWord()">최종 암호 제출 ➔</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- [7] 성공 화면 -->
+        <div id="success-screen" class="screen">
+            <div style="text-align: center; margin: auto 0;">
+                <div style="font-size: 100px; margin-bottom: 20px;">🏆</div>
+                <h1>훈맹정음 탐험 마스터!</h1>
+                <p id="final-praise"></p>
+            </div>
+            <button class="btn btn-success" onclick="location.reload()">다시 처음부터 하기</button>
+        </div>
+    </div>
+
+    <script>
+        /* --- [1] 데이터셋: 훈맹정음 체인 흐름 --- */
+        const BRAILLE_DB = {
+            cho: { 'ㄱ': [4], 'ㄴ': [1,4], 'ㄷ': [2,4], 'ㄹ': [2,4,5], 'ㅁ': [1,5], 'ㅂ': [4,5], 'ㅅ': [6], 'ㅈ': [4,6], 'ㅊ': [5,6], 'ㅋ': [1,2,4], 'ㅌ': [1,2,5], 'ㅍ': [1,4,5], 'ㅎ': [2,4,5,6] },
+            jung: { 'ㅏ': [1,2,6], 'ㅑ': [3,4,1,2,6], 'ㅓ': [2,3,4], 'ㅕ': [1,4,6], 'ㅗ': [1,3,6], 'ㅛ': [3,4,1,3,6], 'ㅜ': [1,3,4], 'ㅠ': [3,4,1,3,4], 'ㅡ': [2,4,6], 'ㅣ': [1,3,5], 'ㅐ': [1,2,3,5], 'ㅔ': [1,3,4,5] },
+            jong: { 'ㄱ': [1], 'ㄴ': [2,5], 'ㄷ': [3,5], 'ㄹ': [2,5,6], 'ㅁ': [2,6], 'ㅂ': [1,2], 'ㅅ': [3], 'ㅇ': [2,3,5,6], 'ㅈ': [1,3], 'ㅊ': [2,3], 'ㅋ': [2,3,5], 'ㅌ': [2,3,6], 'ㅍ': [2,5,6], 'ㅎ': [3,5,6] }
+        };
+
+        const MODULE_DATA = {
+            cho: {
+                title: "자음 탐험: 연결의 비밀",
+                desc: "자음은 기준이 되는 글자에서 한 칸씩 옮기거나 점을 더해 만들어져요. 'ㄴ'에서 'ㄷ', 'ㄹ'로 이어지는 변화를 찾아보세요!",
+                chain: [
+                    { char: 'ㄴ', rule: "자음의 기준 'ㄴ'이에요. 1, 4번 방을 켜보세요." },
+                    { char: 'ㄷ', rule: "'ㄴ'에서 한 칸 아래로(2, 4) 이사하면 'ㄷ'이 돼요!" },
+                    { char: 'ㄹ', rule: "'ㄷ'에 5번 방을 더하면 'ㄹ'이 된답니다." },
+                    { char: 'ㅁ', rule: "새로운 기준 'ㅁ'이에요. 대각선 1, 5번 방!" },
+                    { char: 'ㅂ', rule: "'ㅁ'을 옆으로(4, 5) 옮기면 'ㅂ'이 돼요." },
+                    { char: 'ㅍ', rule: "'ㅂ'에 1번 방을 더해 거센소리 'ㅍ' 완성!" },
+                    { char: 'ㅅ', rule: "외로운 6번 방 하나, 바로 'ㅅ'이에요." },
+                    { char: 'ㅈ', rule: "'ㅅ'에 4번 방을 더하면 'ㅈ'이 됩니다." },
+                    { char: 'ㅊ', rule: "'ㅈ'에 5번 방을 더해 거센소리 'ㅊ'!" },
+                    { char: 'ㅋ', rule: "기역이 아니라 'ㅋ'이 먼저! 1, 2, 4번 방이에요." },
+                    { char: 'ㄱ', rule: "'ㅋ'에서 1, 2번을 빼면 'ㄱ'(4번)이 돼요." },
+                    { char: 'ㅌ', rule: "'ㄴ'에 2, 5번을 더해 거센소리 'ㅌ'!" }
+                ]
+            },
+            jung: {
+                title: "모음 탐험: 대칭의 비밀",
+                desc: "모음은 ㅏ/ㅓ(좌우), ㅗ/ㅜ(상하) 처럼 서로 뒤집힌 모양이에요. 데칼코마니 같은 규칙을 배워볼까요?",
+                chain: [
+                    { char: 'ㅏ', rule: "동그라미 기준 'ㅏ'입니다. (1, 2, 6번)" },
+                    { char: 'ㅓ', rule: "'ㅏ'를 좌우로 뒤집으면 'ㅓ'가 돼요! (2, 3, 4번)" },
+                    { char: 'ㅑ', rule: "'ㅏ'에 3, 4번 방을 더하면 'ㅑ'가 됩니다." },
+                    { char: 'ㅕ', rule: "'ㅓ'에 3, 4번 방을 빼고 1, 6번을... 'ㅕ' 완성!" }, // Simplified for sequence
+                    { char: 'ㅗ', rule: "네모 기준 'ㅗ'예요. (1, 3, 6번)" },
+                    { char: 'ㅜ', rule: "'ㅗ'를 상하로 뒤집으면 'ㅜ'! (1, 3, 4번)" },
+                    { char: 'ㅛ', rule: "'ㅗ'에 3, 4번 방을 더하면 'ㅛ'!" },
+                    { char: 'ㅠ', rule: "'ㅜ'에 3, 4번 방을 더하면 'ㅠ'!" }
+                ]
+            },
+            jong: {
+                title: "받침 탐험: 이사의 비밀",
+                desc: "받침은 첫소리 자음을 '대각선 오른쪽 아래'로 한 칸씩 이사시키면 돼요. 정말 신기하죠?",
+                chain: Object.keys(BRAILLE_DB.cho).map(c => ({
+                    char: c,
+                    isJong: true,
+                    rule: `첫소리 '${c}'를 오른쪽 아래로 한 칸씩 옮겨보세요!`
+                }))
+            }
+        };
+
+        const FINAL_TOPICS = {
+            '🐱 동물': ["나비", "사자", "고래", "두루미", "오리"],
+            '🍔 음식': ["두부", "우유", "포도", "사과", "고기"],
+            '✏️ 학용품': ["가위", "노트", "지우개", "연필", "지도"]
+        };
+
+        const PRAISES = [
+            "우와, 정말 대단해요! 박두성 선생님이 환하게 웃으실 거예요! 🌟",
+            "손끝 감각이 엄청난데요? 완벽한 암호 해독이에요! 🎉",
+            "정답! 훈맹정음의 비밀을 훌륭하게 찾아냈군요! 👏",
+            "띵동댕! 여러분은 멋진 훈맹정음 마스터입니다! 🎖️"
+        ];
+
+        /* --- [2] 상태 관리 --- */
+        let state = {
+            module: '',
+            step: 0,
+            activeDots: new Set(),
+            stamps: { cho: false, jung: false, jong: false },
+            quizCount: 0,
+            finalWord: '',
+            finalCharIdx: 0,
+            finalDots: []
+        };
+
+        /* --- [3] 핵심 로직 --- */
+        function changeScreen(id) {
+            document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            if(id === 'menu-screen') updateMenu();
+        }
+
+        function updateMenu() {
+            for(let key in state.stamps) {
+                if(state.stamps[key]) document.getElementById(`card-${key}`).classList.add('completed');
+            }
+            if(state.stamps.cho && state.stamps.jung && state.stamps.jong) {
+                document.getElementById('card-final').classList.remove('locked');
+                document.getElementById('final-lock').innerText = '🔓';
+            }
+        }
+
+        function goModule(mod) {
+            state.module = mod;
+            const data = MODULE_DATA[mod];
+            document.getElementById('p-title').innerText = data.title;
+            document.getElementById('p-desc').innerText = data.desc;
+            runViz(mod);
+            changeScreen('principle-screen');
+        }
+
+        function runViz(mod) {
+            const dots = document.querySelectorAll('.v-dot');
+            clearInterval(window.vizT);
+            let frame = 0;
+            window.vizT = setInterval(() => {
+                dots.forEach(d => d.classList.remove('active'));
+                if(mod === 'cho') {
+                    if(frame % 2 === 0) [1,4].forEach(i => dots[i-1].classList.add('active')); // ㄴ
+                    else [2,4].forEach(i => dots[i-1].classList.add('active')); // ㄷ
+                } else if(mod === 'jung') {
+                    if(frame % 2 === 0) [1,2,6].forEach(i => dots[i-1].classList.add('active')); // ㅏ
+                    else [2,3,4].forEach(i => dots[i-1].classList.add('active')); // ㅓ
+                } else {
+                    if(frame % 2 === 0) [1,4].forEach(i => dots[i-1].classList.add('active')); // 첫소리 ㄴ
+                    else [2,5].forEach(i => dots[i-1].classList.add('active')); // 받침 ㄴ
+                }
+                frame++;
+            }, 1000);
+        }
+
+        function startExploration() {
+            clearInterval(window.vizT);
+            state.step = 0;
+            loadStep();
+            changeScreen('explore-screen');
+        }
+
+        function loadStep() {
+            state.activeDots.clear();
+            const data = MODULE_DATA[state.module].chain[state.step];
+            const targetDots = data.isJong ? BRAILLE_DB.jong[data.char] : BRAILLE_DB[state.module][data.char];
+            
+            document.getElementById('e-target').innerText = data.isJong ? `받침 ${data.char}` : data.char;
+            document.getElementById('e-rule').innerText = data.rule;
+            document.getElementById('e-pbar').style.width = `${(state.step / MODULE_DATA[state.module].chain.length) * 100}%`;
+            document.getElementById('e-next-btn').classList.add('hidden');
+            
+            updateGrid('.e-dot', targetDots);
+        }
+
+        function tapDot(n) {
+            if(state.activeDots.has(n)) state.activeDots.delete(n);
+            else state.activeDots.add(n);
+            
+            const data = MODULE_DATA[state.module].chain[state.step];
+            const target = data.isJong ? BRAILLE_DB.jong[data.char] : BRAILLE_DB[state.module][data.char];
+            updateGrid('.e-dot', target);
+        }
+
+        function updateGrid(selector, target) {
+            const dots = document.querySelectorAll(selector);
+            dots.forEach(d => {
+                const n = parseInt(d.dataset.dot || d.innerText);
+                d.classList.remove('active', 'coach-highlight');
+                if(state.activeDots.has(n)) d.classList.add('active');
+            });
+
+            let wrong = false;
+            state.activeDots.forEach(d => { if(!target.includes(d)) wrong = true; });
+
+            if(wrong) {
+                document.getElementById('e-coach').innerText = "⚠️ 불이 잘못 켜진 방을 다시 꺼주세요!";
+            } else {
+                const next = target.find(t => !state.activeDots.has(t));
+                if(next) {
+                    document.getElementById('e-coach').innerText = `${next}번 방에 불을 켜주세요!`;
+                    document.querySelector(`${selector}[data-dot="${next}"]`).classList.add('coach-highlight');
+                } else {
+                    document.getElementById('e-coach').innerText = "🎉 완벽해요! 다음으로 가볼까요?";
+                    document.getElementById('e-next-btn').classList.remove('hidden');
+                }
+            }
+        }
+
+        function nextStep() {
+            state.step++;
+            if(state.step < MODULE_DATA[state.module].chain.length) loadStep();
+            else startQuiz();
+        }
+
+        function startQuiz() {
+            state.quizCount = 0;
+            loadQuiz();
+            changeScreen('quiz-screen');
+        }
+
+        function loadQuiz() {
+            const db = BRAILLE_DB[state.module];
+            const keys = Object.keys(db);
+            const correct = keys[Math.floor(Math.random() * keys.length)];
+            const target = db[correct];
+            
+            document.getElementById('q-text').innerText = `(${state.quizCount+1}/5) 이 점자는 무엇일까요?`;
+            const dots = document.querySelectorAll('.q-dot');
+            dots.forEach(d => {
+                const n = parseInt(d.innerText);
+                d.classList.toggle('active', target.includes(n));
+            });
+
+            const opts = [correct];
+            while(opts.length < 4) {
+                const r = keys[Math.floor(Math.random() * keys.length)];
+                if(!opts.includes(r)) opts.push(r);
+            }
+            opts.sort(() => Math.random() - 0.5);
+
+            const grid = document.getElementById('q-options');
+            grid.innerHTML = '';
+            opts.forEach(o => {
+                const b = document.createElement('button');
+                b.className = 'btn';
+                b.innerText = o;
+                b.onclick = () => {
+                    if(o === correct) {
+                        alert(PRAISES[Math.floor(Math.random()*PRAISES.length)]);
+                        state.quizCount++;
+                        if(state.quizCount < 5) loadQuiz();
+                        else {
+                            state.stamps[state.module] = true;
+                            alert("구역 완료! 스탬프를 획득했습니다! 💮");
+                            changeScreen('menu-screen');
+                        }
+                    } else alert("다시 생각해보세요! 할 수 있어요!");
+                };
+                grid.appendChild(b);
+            });
+        }
+
+        /* --- [4] 최종 미션 --- */
+        function goFinal() {
+            if(!state.stamps.cho || !state.stamps.jung || !state.stamps.jong) {
+                alert("🔒 아직 열리지 않았어요! 스탬프 3개를 모아주세요."); return;
+            }
+            const grid = document.getElementById('topic-select');
+            grid.innerHTML = '';
+            for(let topic in FINAL_TOPICS) {
+                const d = document.createElement('div');
+                d.className = 'menu-card';
+                d.innerHTML = `<span class="icon">${topic.split(' ')[0]}</span><div class="title">${topic.split(' ')[1]}</div>`;
+                d.onclick = () => startFinal(topic);
+                grid.appendChild(d);
+            }
+            document.getElementById('topic-select').classList.remove('hidden');
+            document.getElementById('final-game').classList.add('hidden');
+            changeScreen('final-screen');
+        }
+
+        function startFinal(topic) {
+            document.getElementById('topic-select').classList.add('hidden');
+            document.getElementById('final-game').classList.remove('hidden');
+            state.finalWord = FINAL_TOPICS[topic][Math.floor(Math.random()*5)];
+            state.finalCharIdx = 0;
+            state.finalDots = Array.from({length: state.finalWord.length}, () => new Set());
+            loadFinalChar();
+        }
+
+        function loadFinalChar() {
+            const tabs = document.getElementById('f-tabs');
+            tabs.innerHTML = '';
+            state.finalWord.split('').forEach((c, i) => {
+                const t = document.createElement('div');
+                t.className = `word-tab ${i === state.finalCharIdx ? 'active' : ''}`;
+                t.innerText = c;
+                t.onclick = () => { state.finalCharIdx = i; loadFinalChar(); };
+                tabs.appendChild(t);
+            });
+            document.getElementById('f-char').innerText = state.finalWord[state.finalCharIdx];
+            updateFinalGrid();
+        }
+
+        function tapFinalDot(n) {
+            const s = state.finalDots[state.finalCharIdx];
+            if(s.has(n)) s.delete(n); else s.add(n);
+            updateFinalGrid();
+        }
+
+        function updateFinalGrid() {
+            const s = state.finalDots[state.finalCharIdx];
+            document.querySelectorAll('.f-dot').forEach(d => {
+                d.classList.toggle('active', s.has(parseInt(d.dataset.dot)));
+            });
+        }
+
+        function getBraille(c) {
+            const code = c.charCodeAt(0) - 44032;
+            const cho = Math.floor(code / 588);
+            const jung = Math.floor((code % 588) / 28);
+            const jong = code % 28;
+            const CHO = ['ㄱ','ㄲ','ㄴ','ㄷ','ㄸ','ㄹ','ㅁ','ㅂ','ㅃ','ㅅ','ㅆ','ㅇ','ㅈ','ㅉ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+            const JUNG = ['ㅏ','ㅐ','ㅑ','ㅒ','ㅓ','ㅔ','ㅕ','ㅖ','ㅗ','ㅘ','ㅙ','ㅚ','ㅛ','ㅜ','ㅝ','ㅞ','ㅟ','ㅠ','ㅡ','ㅢ','ㅣ'];
+            const JONG = ['', 'ㄱ','ㄲ','ㄳ','ㄴ','ㄵ','ㄶ','ㄷ','ㄹ','ㄺ','ㄻ','ㄼ','ㄽ','ㄾ','ㄿ','ㅀ','ㅁ','ㅂ','ㅄ','ㅅ','ㅆ','ㅇ','ㅈ','ㅊ','ㅋ','ㅌ','ㅍ','ㅎ'];
+            let res = [];
+            if(CHO[cho] !== 'ㅇ') res = res.concat(BRAILLE_DB.cho[CHO[cho]] || []);
+            res = res.concat(BRAILLE_DB.jung[JUNG[jung]] || []);
+            if(jong > 0) res = res.concat(BRAILLE_DB.jong[JONG[jong]] || []);
+            return [...new Set(res)];
+        }
+
+        function submitWord() {
+            let ok = true;
+            state.finalWord.split('').forEach((c, i) => {
+                const target = getBraille(c);
+                const cur = Array.from(state.finalDots[i]);
+                if(target.length !== cur.length || !target.every(v => cur.includes(v))) ok = false;
+            });
+            if(ok) {
+                document.getElementById('final-praise').innerText = PRAISES[Math.floor(Math.random()*PRAISES.length)];
+                changeScreen('success-screen');
+            } else alert("암호가 틀렸어요! 다시 한번 확인해 보세요.");
+        }
+
+        function showHint(val) {
+            const isQuiz = document.getElementById('quiz-screen').classList.contains('active');
+            const dots = document.querySelectorAll(isQuiz ? '.q-dot' : '.f-dot');
+            let target = [];
+            if(isQuiz) {
+                // Find correct char from buttons - simplified
+                return; 
+            } else {
+                target = getBraille(state.finalWord[state.finalCharIdx]);
+            }
+            dots.forEach(d => {
+                const n = parseInt(d.innerText || d.dataset.dot);
+                d.classList.toggle('coach-highlight', val && target.includes(n));
+            });
+        }
+
+        function startApp() { changeScreen('menu-screen'); }
+        function exitFinal() { changeScreen('menu-screen'); }
+    </script>
+</body>
+</html>
