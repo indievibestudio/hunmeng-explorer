@@ -9,9 +9,10 @@
             --bg-color: #f7f5f0;
             --card-bg: #ffffff;
             --primary-color: #8d6e63;
-            --accent-color: #ff9800;
-            --accent-glow: #fff3e0;
-            --ghost-color: rgba(255, 152, 0, 0.15);
+            --primary-dark: #5d4037;
+            --accent-orange: #ff9800;
+            --accent-shadow: #e65100;
+            --ghost-color: rgba(141, 110, 99, 0.15);
             --text-main: #3e2723;
             --text-sub: #795548;
             --border-color: #d7ccc8;
@@ -19,8 +20,7 @@
 
         * {
             box-sizing: border-box;
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: 'Malgun Gothic', sans-serif;
             -webkit-user-select: none;
             user-select: none;
@@ -30,323 +30,233 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+            width: 100vw; height: 100vh;
         }
 
         #app {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
+            width: 100%; height: 100%;
+            display: flex; flex-direction: column;
         }
 
-        /* 메인 및 네비게이션 크기 유연화 */
+        /* [상단 바] 훈맹정음 스탬프 여권 */
         header {
-            height: 8vh;
+            height: 9vh;
             background-color: var(--card-bg);
-            border-bottom: 2px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
+            border-bottom: 4px solid var(--border-color);
+            display: flex; align-items: center; justify-content: space-between;
             padding: 0 3vw;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.03);
+            z-index: 10;
         }
 
         h1 {
-            font-size: clamp(1.2rem, 2.5vh, 2rem);
+            font-size: clamp(1.1rem, 2.6vh, 1.7rem);
             color: var(--primary-color);
             font-weight: bold;
         }
 
-        .stamp-indicator {
-            display: flex;
-            gap: 1vw;
-        }
+        .passport-stamps { display: flex; gap: 1.5vw; }
 
-        .stamp {
-            width: clamp(30px, 4vh, 50px);
-            height: clamp(30px, 4vh, 50px);
+        .leaf-stamp {
+            width: clamp(35px, 5vh, 55px);
+            height: clamp(35px, 5vh, 55px);
             border-radius: 50%;
             background: #e0e0e0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(0.8rem, 1.8vh, 1.2rem);
-            filter: grayscale(1);
-            transition: all 0.3s ease;
+            border: 2px dashed #b0bec5;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(0.75rem, 1.6vh, 0.95rem);
+            font-weight: bold; color: #9e9e9e;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        .stamp.active {
-            filter: grayscale(0);
+        .leaf-stamp.active {
             background: #fff9c4;
-            border: 2px solid var(--accent-color);
-            box-shadow: 0 0 8px var(--accent-color);
+            border: 2px solid var(--accent-orange);
+            color: var(--text-main);
+            box-shadow: 0 0 10px rgba(255,152,0,0.4);
+            transform: scale(1.05);
         }
 
-        main {
-            flex: 1;
-            height: 84vh;
-            position: relative;
-        }
+        main { flex: 1; height: 83vh; position: relative; }
 
-        footer {
-            height: 8vh;
-            background-color: var(--card-bg);
-            border-top: 1px solid var(--border-color);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 0 2vw;
-            text-align: center;
-            font-size: clamp(0.7rem, 1.5vh, 0.9rem);
-            color: #9e9e9e;
-        }
-
-        /* 스크린 레이아웃 */
+        /* [스크린 제어] 가변 배치 */
         .screen {
             position: absolute;
-            width: 100%;
-            height: 100%;
-            display: none;
-            padding: 2vw;
+            width: 100%; height: 100%;
+            display: none; padding: 2vw;
+        }
+        .screen.active { display: flex; }
+
+        /* 🗺️ [메인 화면] 카드 레이아웃 */
+        #screen-home { align-items: center; justify-content: center; }
+        .island-map {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 3vh 3vw;
+            width: 85%; max-width: 900px;
         }
 
-        .screen.active {
-            display: flex;
-        }
-
-        /* 메인 대시보드 */
-        #main-menu {
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 3vw;
-            align-items: center;
-            justify-content: center;
-            padding: 5vw;
-        }
-
-        .menu-card {
+        .landmark-card {
             background: var(--card-bg);
             border: 3px solid var(--border-color);
-            border-radius: 20px;
-            padding: 4vh 2vw;
+            border-bottom: 7px solid var(--border-color);
+            border-radius: 24px;
+            padding: 3.5vh 2vw;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            height: 100%;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .menu-card:hover {
-            transform: translateY(-5px);
-            border-color: var(--primary-color);
-        }
-
-        .menu-card.locked {
-            opacity: 0.6;
-            background: #eae8e3;
-            cursor: not-allowed;
-        }
-
-        .menu-card .icon {
-            font-size: clamp(2rem, 6vh, 4rem);
-            margin-bottom: 2vh;
-        }
-
-        .menu-card h3 {
-            font-size: clamp(1rem, 2.5vh, 1.5rem);
-            margin-bottom: 1vh;
-        }
-
-        /* 📱 반응형 플루이드 기하학 구조 (가로/세로 모드) */
-        .split-container {
-            display: flex;
-            width: 100%;
-            height: 100%;
-            gap: 2vw;
-        }
-
-        @media (orientation: landscape) {
-            .split-container {
-                flex-direction: row;
-            }
-            .left-panel { flex: 1.2; height: 100%; }
-            .right-panel { flex: 0.8; height: 100%; display: flex; align-items: center; justify-content: center; }
-        }
-
-        @media (orientation: portrait) {
-            .split-container {
-                flex-direction: column;
-            }
-            .left-panel { height: 40%; width: 100%; }
-            .right-panel { height: 60%; width: 100%; display: flex; align-items: center; justify-content: center; }
-        }
-
-        /* 안내 및 인터랙션 박스 공통 */
-        .info-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 3vh 2vw;
-            height: 100%;
-            border: 2px solid var(--border-color);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            transition: all 0.1s ease;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
             box-shadow: 0 4px 10px rgba(0,0,0,0.03);
         }
 
-        .instruction-text {
-            font-size: clamp(1rem, 2.3vh, 1.4rem);
+        .landmark-card:active:not(.locked) {
+            transform: translateY(4px);
+            border-bottom-width: 3px;
+        }
+
+        .landmark-card.locked {
+            background: #eae8e3; opacity: 0.6; cursor: not-allowed; border-color: #ccc;
+        }
+
+        .landmark-card .avatar {
+            font-size: clamp(2.2rem, 6vh, 4rem); margin-bottom: 1.5vh;
+        }
+        .landmark-card h3 { font-size: clamp(1rem, 2.4vh, 1.4rem); color: var(--text-main); }
+
+        /* 📱 [반응형 분할 컨테이너] */
+        .split-container { display: flex; width: 100%; height: 100%; gap: 2vw; }
+        @media (orientation: landscape) {
+            .split-container { flex-direction: row; }
+            .left-panel { flex: 1.15; height: 100%; }
+            .right-panel { flex: 0.85; height: 100%; display: flex; align-items: center; justify-content: center; }
+        }
+        @media (orientation: portrait) {
+            .split-container { flex-direction: column; }
+            .left-panel { height: 42%; width: 100%; }
+            .right-panel { height: 58%; width: 100%; display: flex; align-items: center; justify-content: center; }
+        }
+
+        /* [안내 대화 상자] */
+        .dialog-box {
+            background: var(--card-bg);
+            border: 3px solid var(--border-color);
+            border-bottom: 6px solid var(--border-color);
+            border-radius: 28px;
+            padding: 3vh 2.5vw;
+            height: 100%;
+            display: flex; flex-direction: column; justify-content: space-between;
+            box-shadow: 0 6px 15px rgba(0,0,0,0.02);
+        }
+
+        .npc-talk {
+            font-size: clamp(0.95rem, 2.2vh, 1.3rem);
             line-height: 1.6;
             font-weight: 600;
             color: var(--text-main);
         }
 
-        .btn-container {
-            display: flex;
-            gap: 1vw;
-            margin-top: 2vh;
+        .mirror-lever-panel {
+            display: flex; gap: 1.5vw; margin: 1.5vh 0;
+            background: #f0f4c3; padding: 1.5vh; border-radius: 16px;
+            border: 2px dashed #c0ca33;
         }
 
-        button {
-            padding: 1.5vh 2vw;
-            border-radius: 12px;
-            border: none;
-            background-color: var(--primary-color);
-            color: white;
-            font-size: clamp(0.9rem, 2vh, 1.2rem);
-            font-weight: bold;
-            cursor: pointer;
-            transition: background 0.2s;
+        /* 입체 버튼 */
+        .game-controls { display: flex; gap: 1.5vw; margin-top: 1vh; }
+        .pebble-btn {
+            padding: 1.6vh 2.5vw;
+            border-radius: 18px; border: none;
+            background-color: var(--accent-orange);
+            border-bottom: 5px solid var(--accent-shadow);
+            color: white; font-size: clamp(0.85rem, 2vh, 1.15rem); font-weight: bold;
+            cursor: pointer; transition: all 0.05s ease;
         }
-
-        button:hover {
-            background-color: #6d4c41;
+        .pebble-btn:active {
+            transform: translateY(3px); border-bottom-width: 2px;
         }
+        .pebble-btn.nature { background-color: #81c784; border-bottom-color: #388e3c; }
+        .pebble-btn.stone { background-color: #cfd8dc; border-bottom-color: #78909c; color: #37474f; }
 
-        button.secondary {
-            background-color: #b0bec5;
-        }
-
-        button.secondary:hover {
-            background-color: #90a4ae;
-        }
-
-        /* 🔳 계란판 6점판 그래픽스 인터페이스 */
-        .braille-board {
+        /* 🔘 [6점 조약돌 장치] */
+        .pebble-board {
             background: #efebe9;
-            border-radius: 25px;
-            padding: 4vh 3vw;
+            border: 4px solid var(--border-color);
+            border-bottom: 8px solid #bcaaa4;
+            border-radius: 32px;
+            padding: 3.5vh 2.5vw;
             display: grid;
             grid-template-columns: repeat(2, 1fr);
             grid-template-rows: repeat(3, 1fr);
-            gap: 3vh 4vw;
-            width: clamp(260px, 45vh, 400px);
-            height: clamp(340px, 60vh, 550px);
-            box-shadow: inset 0 4px 10px rgba(0,0,0,0.1);
-            border: 4px solid #d7ccc8;
+            gap: 2vh 3.5vw;
+            width: clamp(240px, 45vh, 370px);
+            height: clamp(320px, 60vh, 500px);
+            box-shadow: inset 0 4px 10px rgba(0,0,0,0.05);
         }
 
-        .dot {
-            background: #d1c4e9;
+        .pebble-dot {
+            background: #d7ccc8;
             border-radius: 50%;
             aspect-ratio: 1;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: clamp(1rem, 2.5vh, 1.5rem);
-            font-weight: bold;
-            color: rgba(255,255,255,0.7);
-            cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1), inset 0 -4px 6px rgba(0,0,0,0.1);
-            transition: all 0.2s ease;
-            position: relative;
+            display: flex; align-items: center; justify-content: center;
+            font-size: clamp(1.1rem, 2.5vh, 1.5rem); font-weight: bold;
+            color: rgba(255,255,255,0.7); cursor: pointer;
+            border-bottom: 5px solid #bcaaa4;
+            transition: all 0.1s ease;
         }
 
-        .dot.active {
-            background: var(--accent-color);
+        .pebble-dot.active {
+            background: var(--accent-orange);
             color: white;
-            box-shadow: 0 0 15px var(--accent-color), inset 0 -4px 6px rgba(0,0,0,0.2);
+            border-bottom-color: var(--accent-shadow);
+            box-shadow: 0 0 15px var(--accent-orange);
         }
 
-        /* 전문가 검수: 기본점 잔상 및 하이라이트 연출 효과 */
-        .dot.dot-ghost {
+        .pebble-dot.dot-ghost {
             background: var(--ghost-color);
-            border: 3px dashed var(--accent-color);
-            color: var(--accent-color);
+            border: 3px dashed var(--primary-color);
+            border-bottom-width: 3px;
+            color: var(--primary-color);
         }
 
-        .dot.coach-highlight {
-            animation: pulse-glow 1s infinite alternate;
+        .pebble-dot.coach-highlight {
+            animation: pulse-light 0.8s infinite alternate;
+        }
+        @keyframes pulse-light {
+            0% { background-color: #ffcc80; border-bottom-color: #f57c00; box-shadow: 0 0 5px #ffcc80; }
+            100% { background-color: #ffe082; border-bottom-color: #ffa000; box-shadow: 0 0 22px var(--accent-orange); }
         }
 
-        @keyframes pulse-glow {
-            0% { transform: scale(1); box-shadow: 0 0 5px #ffb74d; }
-            100% { transform: scale(1.05); box-shadow: 0 0 25px #ff9800; }
+        /* 📋 객관식 문항 */
+        .wood-option-box { display: flex; flex-direction: column; gap: 1.2vh; margin-top: 1.5vh; }
+        .wood-option {
+            background: #fafafa; border: 2px solid #e0e0e0; border-bottom: 5px solid #d5d5d5;
+            padding: 1.6vh 2vw; border-radius: 16px; cursor: pointer;
+            font-size: clamp(0.9rem, 2vh, 1.15rem); font-weight: bold; text-align: left;
+            transition: all 0.05s;
         }
+        .wood-option:active { transform: translateY(2px); border-bottom-width: 3px; }
 
-        /* 모음 전용 대칭 뒤집기 컨트롤 인터페이스 */
-        .mirror-controls {
-            display: flex;
-            justify-content: center;
-            gap: 2vw;
-            margin-top: 2vh;
+        /* 🏅 [명예 수료 상장 모달] */
+        .passport-modal {
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background: rgba(0,0,0,0.5); backdrop-filter: blur(4px);
+            display: none; align-items: center; justify-content: center; z-index: 1000;
         }
+        .passport-modal.active { display: flex; }
 
-        /* 상장 마스터 수료증 모달 */
-        .modal {
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: rgba(0,0,0,0.7);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            padding: 2vw;
+        .passport-card {
+            background: var(--card-bg); border: 10px double var(--primary-color);
+            padding: 4vh 3vw; width: clamp(310px, 85vw, 550px); border-radius: 28px;
+            text-align: center; box-shadow: 0 15px 35px rgba(0,0,0,0.25);
         }
+        .islander-name-input { margin: 2vh auto; padding: 1vh; font-size: 1.1rem; width: 60%; text-align: center; border: 2px solid var(--border-color); border-radius: 12px; font-weight: bold; color: var(--text-main); }
+        .passport-msg { font-size: clamp(0.9rem, 2vh, 1.15rem); line-height: 1.7; margin: 2.5vh 0; color: var(--text-sub); font-weight: bold; text-align: justify; }
 
-        .modal.active { display: flex; }
-
-        .certificate-box {
-            background: #fff;
-            border: 15px double #cfb53b;
-            padding: 5vh 4vw;
-            width: clamp(320px, 80vw, 650px);
-            max-height: 90vh;
-            text-align: center;
-            border-radius: 10px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-            overflow-y: auto;
+        footer {
+            height: 8vh; background-color: var(--card-bg); border-top: 1px solid var(--border-color);
+            display: flex; align-items: center; justify-content: center; padding: 0 2vw;
+            text-align: center; font-size: clamp(0.7rem, 1.6vh, 0.85rem); color: #9e9e9e;
         }
-
-        .cert-title { font-size: clamp(1.5rem, 4vh, 2.5rem); color: #996515; font-weight: bold; margin-bottom: 3vh; }
-        .cert-nameInput { margin: 2vh 0; padding: 1.5vh; font-size: 1.2rem; width: 60%; text-align: center; border: 2px solid #b0bec5; border-radius: 8px; }
-        .cert-body { font-size: clamp(1rem, 2.2vh, 1.3rem); line-height: 1.8; margin-bottom: 4vh; color: #37474f; text-align: justify; text-justify: inter-character; }
-
-        /* 단과 및 수료 테스트 공통 객관식 문항 인터페이스 */
-        .quiz-option-container {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5vh;
-            margin-top: 2vh;
-        }
-        .quiz-option {
-            background: #f5f5f5;
-            border: 2px solid #e0e0e0;
-            padding: 2vh 2vw;
-            border-radius: 10px;
-            cursor: pointer;
-            font-size: 1.1rem;
-            text-align: left;
-            transition: all 0.2s;
-        }
-        .quiz-option:hover { background: #efebe9; border-color: var(--primary-color); }
     </style>
 </head>
 <body>
@@ -354,97 +264,94 @@
 <div id="app">
     <header>
         <h1 onclick="goHome()" style="cursor:pointer;">손끝 한글 : 훈맹정음 탐험대</h1>
-        <div class="stamp-indicator">
-            <div class="stamp" id="stamp-first">초성</div>
-            <div class="stamp" id="stamp-middle">모음</div>
-            <div class="stamp" id="stamp-last">받침</div>
+        <div class="passport-stamps">
+            <div class="leaf-stamp" id="stamp-first">첫소리</div>
+            <div class="leaf-stamp" id="stamp-middle">모음</div>
+            <div class="leaf-stamp" id="stamp-last">받침</div>
         </div>
     </header>
 
     <main>
-        <!-- [메인 메뉴 화면] -->
         <div id="screen-home" class="screen active">
-            <div id="main-menu" style="display: grid; width:100%;">
-                <div class="menu-card" onclick="startSection('first')">
-                    <div class="icon">☝️</div>
+            <div class="island-map">
+                <div class="landmark-card" onclick="launchCamp('first')">
+                    <div class="avatar">⛺</div>
                     <h3>첫소리 탐험 구역</h3>
-                    <p>기준점이 되는 원리로 정복하기</p>
+                    <p style="font-size:0.85rem; color:var(--text-sub); margin-top:0.5vh;">기본점 원소 학습</p>
                 </div>
-                <div class="menu-card" onclick="startSection('middle')">
-                    <div class="icon">☀️</div>
+                <div class="landmark-card" onclick="launchCamp('middle')">
+                    <div class="avatar">☀️</div>
                     <h3>가운뎃소리 모음 탐험</h3>
-                    <p>상하좌우 거울 대칭의 원리</p>
+                    <p style="font-size:0.85rem; color:var(--text-sub); margin-top:0.5vh;">거울 대칭 뒤집기 마법</p>
                 </div>
-                <div class="menu-card" onclick="startSection('last')">
-                    <div class="icon">👇</div>
+                <div class="landmark-card" onclick="launchCamp('last')">
+                    <div class="avatar">📮</div>
                     <h3>끝소리 받침 탐험</h3>
-                    <p>왼쪽과 아래로 이동하는 비밀</p>
+                    <p style="font-size:0.85rem; color:var(--text-sub); margin-top:0.5vh;">수평·수직 위치 이동의 비밀</p>
                 </div>
-                <div class="menu-card locked" id="card-final" onclick="startFinalRoom()">
-                    <div class="icon">🔒</div>
-                    <h3>최종 암호 해독실</h3>
-                    <p>마스터 수료증에 도전하세요</p>
+                <div class="landmark-card locked" id="final-dungeon-card" onclick="launchFinalCastle()">
+                    <div class="avatar">🏆</div>
+                    <h3>명예의 전당 보상실</h3>
+                    <p style="font-size:0.85rem; color:var(--text-sub); margin-top:0.5vh;">최종 종합 자격시험</p>
                 </div>
             </div>
         </div>
 
-        <!-- [1단계 및 2단계: 통합 탐험 조작방 엔진] -->
         <div id="screen-explore" class="screen">
             <div class="split-container">
                 <div class="left-panel">
-                    <div class="info-card">
+                    <div class="dialog-box">
                         <div>
-                            <h2 id="explore-title" style="margin-bottom:2vh; color:var(--primary-color);"></h2>
-                            <p id="explore-guide" class="instruction-text"></p>
-                            <!-- 모음방 전용 변형 매직 미러 버튼 트랙 -->
-                            <div class="mirror-controls" id="mirror-area" style="display:none;">
-                                <button onclick="triggerMirror('lr')">좌우 뒤집기 ↔️</button>
-                                <button onclick="triggerMirror('ud')">위아래 뒤집기 ↕️</button>
+                            <h2 id="exp-headline" style="color:var(--primary-dark); margin-bottom:1.5vh;"></h2>
+                            <p id="exp-bubble" class="npc-talk"></p>
+                            
+                            <div class="mirror-lever-panel" id="lever-track" style="display:none;">
+                                <button class="pebble-btn nature" onclick="pullLever('lr')">좌우 반사 레버 ↔️</button>
+                                <button class="pebble-btn nature" onclick="pullLever('ud')">위아래 뒤집기 레버 ↕️</button>
                             </div>
                         </div>
-                        <div class="btn-container">
-                            <button class="secondary" onclick="goHome()">탐험 지도로 돌아가기</button>
-                            <button id="btn-next-explore" onclick="nextExploreStep()" style="display:none; background:#4caf50;">다음 글자로 ➔</button>
+                        <div class="game-controls">
+                            <button class="pebble-btn stone" onclick="goHome()">탐험 지도로</button>
+                            <button class="pebble-btn" id="btn-next-step" onclick="forwardStep()" style="display:none; background-color:#4caf50; border-color:#2e7d32;">다음 글자로 ➔</button>
                         </div>
                     </div>
                 </div>
                 <div class="right-panel">
-                    <div class="braille-board" id="explore-board">
-                        <div class="dot" data-id="1" onclick="touchDot(1)">1</div>
-                        <div class="dot" data-id="4" onclick="touchDot(4)">4</div>
-                        <div class="dot" data-id="2" onclick="touchDot(2)">2</div>
-                        <div class="dot" data-id="5" onclick="touchDot(5)">5</div>
-                        <div class="dot" data-id="3" onclick="touchDot(3)">3</div>
-                        <div class="dot" data-id="6" onclick="touchDot(6)">6</div>
+                    <div class="pebble-board" id="main-pebble-board">
+                        <div class="pebble-dot" data-id="1" onclick="pressPebble(1)">1</div>
+                        <div class="pebble-dot" data-id="4" onclick="pressPebble(4)">4</div>
+                        <div class="pebble-dot" data-id="2" onclick="pressPebble(2)">2</div>
+                        <div class="pebble-dot" data-id="5" onclick="pressPebble(5)">5</div>
+                        <div class="pebble-dot" data-id="3" onclick="pressPebble(3)">3</div>
+                        <div class="pebble-dot" data-id="6" onclick="pressPebble(6)">6</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- [3단계: 단과 및 마스터 통합 평가 퀴즈 엔진] -->
         <div id="screen-quiz" class="screen">
             <div class="split-container">
                 <div class="left-panel">
-                    <div class="info-card">
+                    <div class="dialog-box">
                         <div>
-                            <h2 id="quiz-title" style="margin-bottom:2vh; color:var(--accent-color);">단과 테스트</h2>
-                            <p id="quiz-question" class="instruction-text" style="margin-bottom:3vh;"></p>
-                            <div class="quiz-option-container" id="quiz-options"></div>
+                            <h2 id="quiz-header-tag" style="color:var(--accent-orange); margin-bottom:1.5vh;">관문 퀴즈</h2>
+                            <p id="quiz-prompt-text" class="npc-talk" style="margin-bottom:2.5vh;"></p>
+                            <div class="wood-option-box" id="quiz-options-place"></div>
                         </div>
-                        <div class="btn-container">
-                            <button id="btn-quiz-hint" style="background:#0288d1;">힌트 보기 💡</button>
-                            <button class="secondary" onclick="goHome()">중단하기</button>
+                        <div class="game-controls">
+                            <button class="pebble-btn" id="hint-pad-trigger" style="background:#0288d1; border-color:#01579b;">반딧불이 힌트 💡</button>
+                            <button class="pebble-btn stone" onclick="goHome()">중단하기</button>
                         </div>
                     </div>
                 </div>
                 <div class="right-panel">
-                    <div class="braille-board" id="quiz-board" style="opacity: 0.5; pointer-events: none;">
-                        <div class="dot" data-q="1">1</div>
-                        <div class="dot" data-q="4">4</div>
-                        <div class="dot" data-q="2">2</div>
-                        <div class="dot" data-q="5">5</div>
-                        <div class="dot" data-q="3">3</div>
-                        <div class="dot" data-q="6">6</div>
+                    <div class="pebble-board" id="quiz-shadow-board" style="opacity: 0.5; pointer-events: none;">
+                        <div class="pebble-dot" data-q="1">1</div>
+                        <div class="pebble-dot" data-q="4">4</div>
+                        <div class="pebble-dot" data-q="2">2</div>
+                        <div class="pebble-dot" data-q="5">5</div>
+                        <div class="pebble-dot" data-q="3">3</div>
+                        <div class="pebble-dot" data-q="6">6</div>
                     </div>
                 </div>
             </div>
@@ -456,300 +363,268 @@
     </footer>
 </div>
 
-<!-- 마스터 국가 수료 상장 모달 발급기 -->
-<div class="modal" id="modal-cert">
-    <div class="certificate-box">
+<div class="passport-modal" id="modal-island-passport">
+    <div class="passport-card">
         <div>
-            <div class="cert-title">훈맹정음 마스터 수료증</div>
-            <div style="font-size:1.1rem; color:#78909c; margin-bottom:2vh;">탐험대원 명예 상장</div>
-            <input type="text" id="student-name" class="cert-nameInput" placeholder="이름을 입력하세요" maxlength="8">
-            <div class="cert-body" id="cert-print-zone">
-                위 사람은 송암 박두성 선생님이 창제한 한글 점자 '훈맹정음'의 기본점 원리, 대칭 원리, 그리고 위치 이동의 원리를 훌륭하게 탐구하고 최종 자격시험을 완벽하게 통과하였으므로 이 수료증을 수여합니다.
+            <h2 style="color:var(--primary-dark);">명예 주민 인증서</h2>
+            <div style="font-size:1rem; color:var(--primary-color); font-weight:bold; margin-bottom:2vh;">✨ 훈맹정음 비밀 탐험대 명예의 전당</div>
+            <input type="text" id="islander-name" class="islander-name-input" placeholder="탐험대원 이름 입력" maxlength="8">
+            <div class="passport-msg" id="passport-text-layout">
+                위 사람은 송암 박두성 선생님이 창제한 우리말 점자 '훈맹정음'의 위대한 기준점 원리, 차원 대칭 뒤집기 기믹, 그리고 수평·수직 위치 이동의 비밀 규칙을 완벽하게 완수하고 최종 자격시험을 통과하였으므로 명예 마스터 주민으로 임명하며 본 증서를 수여합니다.
             </div>
         </div>
-        <div class="btn-container" style="justify-content: center;">
-            <button onclick="downloadCert()" style="background:#ffb300; color:#3e2723;">🥇 수료증 이미지 저장하기</button>
-            <button class="secondary" onclick="closeCertModal()">닫기</button>
+        <div class="game-controls" style="justify-content: center;">
+            <button class="pebble-btn" onclick="generateAndSaveCertificate()" style="background:#ffb300; border-color:#ff8f00; color:#3e2723;">🥇 상장 이미지 저장하기</button>
+            <button class="pebble-btn stone" onclick="dismissPassport()">마을로 돌아가기</button>
         </div>
     </div>
 </div>
 
 <script>
-    // 훈맹정음 데이터베이스 고증 구조화 (1=켬, 0=끔 법칙 정밀 마킹)
-    const database = {
+    const levelDatabase = {
         first: [
-            { char: "ㄱ", dots: [4], isBase: true, msg: "첫소리 탐험 시작! 첫소리 자음은 특정 기준점을 기반으로 묶여 있습니다. 먼저 [4번 점]을 켜서 모든 자음의 기초가 되는 'ㄱ'을 완성해 보세요." },
-            { char: "ㄴ", dots: [4, 1], isBase: false, base: [4], msg: "기본점 [4번(ㄱ)]이 연하게 깔려 있습니다. 여기에 [1번 점]을 더해 추가하면 멋진 'ㄴ'이 완성됩니다." },
-            { char: "ㄷ", dots: [4, 2], isBase: false, base: [4], msg: "마찬가지로 기본점 [4번(ㄱ)] 베이스 위에 이번에는 [2번 점]을 추가로 찍어주면 'ㄷ'이 완성됩니다." },
-            { char: "ㄹ", dots: [5], isBase: true, msg: "이번에는 기준점이 바뀝니다. [5번 점]을 켜서 다음 계열의 뼈대가 되는 'ㄹ'을 만들어보세요." },
-            { char: "ㅁ", dots: [5, 1], isBase: false, base: [5], msg: "기본점 [5번(ㄹ)] 베이스가 보이시나요? 여기에 [1번 점]을 더하면 'ㅁ'으로 확장됩니다." },
-            { char: "ㅂ", dots: [5, 4], isBase: false, base: [5], msg: "기본점 [5번(ㄹ)] 베이스 위에 이번에는 오른쪽 [4번 점]을 결합하여 'ㅂ'을 완성해 보세요." },
-            { char: "ㅅ", dots: [6], isBase: true, msg: "세 번째 기준점입니다. 맨 오른쪽 아래 [6번 점]을 켜서 'ㅅ'을 완성하세요." },
-            { char: "ㅈ", dots: [6, 4], isBase: false, base: [6], msg: "기본점 [6번(ㅅ)] 위에 [4번 점]을 더해주면 'ㅈ'이 형성됩니다." },
-            { char: "ㅊ", dots: [6, 5], isBase: false, base: [6], msg: "기본점 [6번(ㅅ)] 위에 [5번 점]을 한 칸 추가하여 거센소리 'ㅊ'의 원리를 마스터하세요." },
-            { char: "ㅋ", dots: [1, 2, 4], isBase: true, msg: "이번에는 특별한 복합 기준점인 [1, 2번 점]을 먼저 켜고 [4번 점]을 더해 'ㅋ'을 만들어 봅니다." },
-            { char: "ㅌ", dots: [1, 2, 5], isBase: false, base: [1, 2], msg: "복합 기준점 [1, 2번] 베이스를 그대로 둔 채, [5번 점]을 추가로 찍으면 'ㅌ'이 완성됩니다." },
-            { char: "ㅍ", dots: [4, 5, 1], isBase: true, msg: "마지막 기준점 세트입니다. 오른쪽 [4, 5번 점]을 축으로 삼고 [1번 점]을 더해 'ㅍ'을 완성하세요." },
-            { char: "ㅎ", dots: [4, 5, 2], isBase: false, base: [4, 5], msg: "마지막으로 [4, 5번] 기준점 상태에서 [2번 점]을 연격해 주면 첫소리의 최종 암호 'ㅎ'이 마감됩니다." }
+            { char: "ㄱ", dots: [4], isBase: true, msg: "첫소리 자음들은 무작위가 아니라 기준점을 중심으로 가족처럼 묶여 있어요.\n우선 모든 자음의 뿌리가 되는 [4번 조약돌]에 불을 켜서 'ㄱ'을 완성해 보세요!" },
+            { char: "ㄴ", dots: [4, 1], isBase: false, base: [4], msg: "잘했습니다! 방금 배운 기본점 [4번(ㄱ)]이 연한 잔상으로 깔려 있죠?\n여기에 [1번 조약돌]을 추가로 채워 주면 멋진 'ㄴ'이 완성됩니다." },
+            { char: "ㄷ", dots: [4, 2], isBase: false, base: [4], msg: "마찬가지로 기본점 [4번(ㄱ)] 베이스 위에 이번에는 [2번 조약돌] 에너지를 추가하면 'ㄷ'이 조립됩니다!" },
+            { char: "ㄹ", dots: [5], isBase: true, msg: "자, 이번에는 기준점이 바뀝니다! 다음 계열의 뼈대가 되는 [5번 조약돌]을 켜서 'ㄹ'을 작동시켜 보세요." },
+            { char: "ㅁ", dots: [5, 1], isBase: false, base: [5], msg: "기본점 [5번(ㄹ)] 베이스가 보이죠? 여기에 [1번 조약돌]을 합성하면 'ㅁ' 원소가 도출됩니다." },
+            { char: "ㅂ", dots: [5, 4], isBase: false, base: [5], msg: "기본점 [5번(ㄹ)] 위에 오른쪽 [4번 조약돌]을 결합하여 친척 관계인 'ㅂ'을 연성해 보세요." },
+            { char: "ㅅ", dots: [6], isBase: true, msg: "세 번째 기둥 기준점입니다! 맨 오른쪽 아래 [6번 조약돌]을 터치해서 'ㅅ'을 활성화해 보세요." },
+            { char: "ㅈ", dots: [6, 4], isBase: false, base: [6], msg: "기본점 [6번(ㅅ)] 위에 [4번 조약돌] 에너지를 융합하면 'ㅈ'으로 진화합니다!" },
+            { char: "ㅊ", dots: [6, 5], isBase: false, base: [6], msg: "기본점 [6번(ㅅ)] 위에 [5번 조약돌]을 한 칸 채워 거센소리 친척 'ㅊ'을 격파해 보세요." },
+            { char: "ㅋ", dots: [1, 2, 4], isBase: true, msg: "이번엔 강력한 복합 기준점인 [1, 2번]을 켜고 [4번 조약돌]을 더해서 거센소리 'ㅋ'의 암호를 풀어보세요." },
+            { char: "ㅌ", dots: [1, 2, 5], isBase: false, base: [1, 2], msg: "복합 기준점 [1, 2번] 베이스를 그대로 유지한 상태에서, [5번 조약돌]을 얹어주면 'ㅌ'이 연성 완료됩니다!" },
+            { char: "ㅍ", dots: [4, 5, 1], isBase: true, msg: "마지막 기준점 영역입니다! 오른쪽 [4, 5번 조약돌]을 축으로 삼고 [1번]을 연결해 거센소리 'ㅍ'을 획득하세요!" },
+            { char: "ㅎ", dots: [4, 5, 2], isBase: false, base: [4, 5], msg: "마지막 암호! [4, 5번] 기준점 장치 상태에서 [2번 조약돌]에 불을 켜면 첫소리 대미션 완료!" }
         ],
         middle: [
-            { char: "ㅏ", dots: [1, 2, 6], msg: "가운뎃소리는 단모음 10개의 '대칭의 원리'로 작동합니다. 먼저 기본이 되는 'ㅏ'를 1, 2, 6번 방에 불을 켜서 만들어 보세요." },
-            { char: "ㅑ", dots: [3, 4, 5], isMirror: true, origin: "ㅏ", msg: "기본 모음 'ㅏ'에서 점들이 반사되어 이동하는 대칭 조작법입니다. 하단의 '뒤집기 컨트롤' 인터페이스를 눌러 변형되는 모습을 확인하며 완성해 보세요!" },
-            { char: "ㅓ", dots: [2, 4, 5], isMirror: true, origin: "ㅏ", msg: "'ㅏ' 점자 구조에서 좌우 거울 대칭을 적용하면 'ㅓ'가 됩니다. 미러 버튼을 활용해 규칙성을 인지해 보세요." },
-            { char: "ㅕ", dots: [1, 5, 6], isMirror: true, origin: "ㅏ", msg: "'ㅓ' 구조에서 파생된 대칭 짝궁인 'ㅕ'입니다. 버튼을 교차 조작하여 불빛의 이동을 찾아내세요." },
-            { char: "ㅗ", dots: [1, 3, 6], msg: "두 번째 기준 세트 'ㅗ'입니다. 하늘로 열린 규칙을 생각하며 1, 3, 6번 방을 터치하세요." },
-            { char: "ㅛ", dots: [3, 4, 6], isMirror: true, origin: "ㅗ", msg: "전문가 고증 정밀 교정: 'ㅛ'의 정확한 점형은 [3, 4, 6번]입니다. 'ㅗ'에서 뒤집기를 통해 파생되는 대칭미를 확인하세요." },
-            { char: "ㅜ", dots: [1, 3, 4], isMirror: true, origin: "ㅗ", msg: "'ㅗ'를 상하로 완벽히 반전 뒤집기를 수행하면 'ㅜ'(1,3,4번)가 도출됩니다." },
-            { char: "ㅠ", dots: [1, 4, 6], isMirror: true, origin: "ㅜ", msg: "전문가 고증 정밀 교정: 'ㅠ'의 올바른 비트는 [1, 4, 6번]입니다. 상하좌우 조작을 통해 찾아내세요." },
-            { char: "ㅡ", dots: [2, 4, 6], msg: "가로선 모양의 기준 모음 'ㅡ'입니다. 2, 4, 6번 점을 정방향 마킹하세요." },
-            { char: "ㅣ", dots: [1, 3, 5], isMirror: true, origin: "ㅡ", msg: "'ㅡ'와 완벽한 기하학적 직각 대칭을 이루는 'ㅣ'(1,3,5번)를 상호 뒤집기 제어로 해독해 보세요." }
+            { char: "ㅏ", dots: [1, 2, 6], msg: "모음 탐험에서는 단모음 10개의 '대칭 반사 마법'을 배워요.\n우선 기본이 되는 정방향 'ㅏ'의 1, 2, 6번 방을 켜보세요!" },
+            { char: "💡 모음 규칙 안내", dots: [1,2,6], isSpecialNotice: true, msg: "모음은 자음과 달리 형태의 대칭성을 가집니다.\nㅏ, ㅑ, ㅓ, ㅕ는 서로 거울 대칭이며, ㅗ, ㅛ, ㅜ, ㅠ 역시 상하 거울 대칭을 이룹니다. ㅡ와 ㅣ는 수직 직각 대칭을 이루고 있습니다." },
+            { char: "야(야)", dots: [3, 4, 5], isMirror: true, msg: "★정밀 고증 반영: 'ㅑ'의 정확한 6점자는 [3, 4, 5번]입니다.\nㅏ(1,2,6)에서 점들이 반사되어 튕겨 나간 대칭 구조를 확인해 보세요!" },
+            { char: "ㅓ", dots: [2, 4, 5], isMirror: true, msg: "'ㅏ'에서 좌우 거울 대칭 마법을 가하면 'ㅓ'가 연출됩니다. 대칭 레버를 당겨 확인해 보세요!" },
+            { char: "ㅕ", dots: [1, 5, 6], isMirror: true, msg: "'ㅓ'에서 유도된 거울 짝꿍 'ㅕ'입니다. 레버 조작 기믹으로 불빛의 완벽한 미러링을 유도해 보세요." },
+            { char: "ㅗ", dots: [1, 3, 6], msg: "두 번째 모음 기준 세트 'ㅗ'입니다. 하늘을 향해 기운이 열려 있는 1, 3, 6번 조약돌을 충전해 보세요." },
+            { char: "ㅛ", dots: [3, 4, 6], isMirror: true, msg: "★정밀 고증 반영: 'ㅛ'의 완벽한 6점자는 [3, 4, 6번]방입니다. 'ㅗ'에서 파생되는 대칭 전이를 레버로 유도해 보세요." },
+            { char: "ㅜ", dots: [1, 3, 4], isMirror: true, msg: "'ㅗ'를 위아래로 완벽히 뒤집어 반전시키는 상하 미러링을 적용하면 'ㅜ'(1,3,4번)가 나타집니다!" },
+            { char: "ㅠ", dots: [1, 4, 6], isMirror: true, msg: "★정밀 고증 반영: 'ㅠ'의 진짜 점형은 [1, 4, 6번]입니다. 상하 레버를 조작해서 충전 레벨을 맞춰보세요." },
+            { char: "ㅡ", dots: [2, 4, 6], msg: "가로 평행선 모양을 띄는 기준 모음 'ㅡ'입니다. 2, 4, 6번 조약돌을 깔끔하게 마킹해 보세요." },
+            { char: "ㅣ", dots: [1, 3, 5], isMirror: true, msg: "'ㅡ'와 수직 직각 대칭 크로스를 이루는 'ㅣ'(1,3,5번)를 상호 뒤집기 레버 조작으로 완성해 보세요!" }
         ],
         last: [
-            { char: "ㄱ", dots: [2, 5], original: [1, 4], direction: "left", msg: "끝소리 받침은 첫소리 글자가 '공간 이동'하는 원리입니다. 첫소리 'ㄱ'(1,4)을 [왼쪽으로 한 칸] 수평 이동시켜 받침 'ㄱ'(2,5)을 만들어 보세요." },
-            { char: "ㄴ", dots: [2, 5], original: [1, 4], direction: "down", msg: "받침 'ㄴ'입니다. 첫소리 'ㄴ'(1,4)을 이번에는 규칙에 따라 [아래쪽으로 한 칸] 수직 이동시켜 받침 'ㄴ'(2,5)을 조립하세요." },
-            { char: "ㄷ", dots: [3, 6], original: [2, 5], direction: "down", msg: "첫소리 'ㄷ'(2,5) 상태에서 [아래쪽으로 한 칸] 그대로 슬라이딩 다운하여 받침 'ㄷ'(3,6)을 완성합니다." },
-            { char: "ㄹ", dots: [3, 4, 5, 6], original: [2, 3, 5, 6], direction: "left", msg: "첫소리 'ㄹ' 조합을 통째로 모아 [왼쪽으로 한 칸] 전진 정렬시켜 받침 'ㄹ'을 완성하세요." },
-            { char: "ㅁ", dots: [2, 6], original: [1, 5], direction: "down", msg: "첫소리 'ㅁ'(1,5) 단계를 기점으로 [아래쪽으로 한 칸] 수직 연출을 단행하여 받침 'ㅁ'(2,6)을 빌드합니다." },
-            { char: "ㅂ", dots: [1, 2], original: [4, 5], direction: "left", msg: "첫소리 'ㅂ'(4,5) 레이아웃을 축으로 [왼쪽으로 한 칸] 공간 평행 이동을 전개해 받침 'ㅂ'(1,2)을 구축합니다." },
-            { char: "ㅅ", dots: [3], original: [6], direction: "left", msg: "첫소리 'ㅅ'(6번 방)을 그대로 수평축을 따라 [왼쪽으로 한 칸] 이사 시켜 받침 'ㅅ'(3번 방)을 점등하세요." },
-            { char: "ㅈ", dots: [1, 3], original: [4, 6], direction: "left", msg: "첫소리 'ㅈ'(4,6) 조합을 [왼쪽으로 한 칸] 가동하여 받침 'ㅈ'(1,3)의 비밀을 풀어냅니다." },
-            { char: "ㅊ", dots: [2, 3], original: [5, 6], direction: "left", msg: "첫소리 'ㅊ'(5,6) 콤비를 그대로 [왼쪽으로 한 칸] 시프트 제어하여 받침 'ㅊ'(2,3)을 매핑합니다." },
-            { char: "ㅋ", dots: [3, 5, 6], original: [1, 2, 4], direction: "down", msg: "첫소리 'ㅋ'을 [아래쪽으로 한 칸] 당겨내려 받침 'ㅋ'의 공간 미학을 확인하세요." },
-            { char: "ㅌ", dots: [3, 5, 6], original: [1, 2, 5], direction: "down", msg: "첫소리 'ㅌ' 진형을 그대로 [아래쪽으로 한 칸] 가라앉혀 받침 'ㅌ'을 완성하세요." },
-            { char: "ㅍ", dots: [2, 3, 5], original: [1, 4, 5], direction: "down", msg: "첫소리 'ㅍ' 공간을 기반으로 [아래쪽으로 한 칸] 밀어주어 받침 'ㅍ'을 완성해 줍니다." },
-            { char: "ㅎ", dots: [3, 5, 6], original: [2, 4, 5, 6], direction: "down", msg: "첫소리 'ㅎ'을 기반으로 [아래쪽으로 한 칸] 이동 규칙을 적용해 받침 'ㅎ'을 설정하세요." },
-            { char: "ㅇ", dots: [2, 3, 5, 6], isSpecial: true, msg: "★ 중요 예외 고증: 첫소리 'ㅇ'은 점자에서 생략하지만, 받침 'ㅇ'은 절대 생략하지 않고 반드시 [2, 3, 5, 6번 방]에 불을 밝혀 명시해야 합니다!" }
+            { char: "ㄱ", dots: [2, 5], original: [1, 4], msg: "끝소리 받침은 첫소리가 수평/수직으로 이동하는 원리입니다.\n첫소리 'ㄱ'(1,4)을 [왼쪽으로 한 칸] 수평 이사 시켜 받침 'ㄱ'(2,5)을 조립해 보세요!" },
+            { char: "ㄴ", dots: [2, 5], original: [1, 4], msg: "받침 'ㄴ'입니다! 첫소리 'ㄴ'(1,4)을 이번에는 공간 규칙에 따라 [아래쪽으로 한 칸] 수직 이사 시켜서 안착시켜 보세요." },
+            { char: "ㄷ", dots: [3, 6], original: [2, 5], msg: "첫소리 'ㄷ'(2,5) 상태에서 그대로 슬라이딩 다운! [아래쪽으로 한 칸] 수직 이사하여 받침 'ㄷ'(3,6) 완성!" },
+            { char: "ㄹ", dots: [3, 4, 5, 6], original: [2, 3, 5, 6], msg: "첫소리 'ㄹ' 블록을 통째로 묶어서 [왼쪽으로 한 칸] 수평 이동 제어하면 받침 'ㄹ'이 도출됩니다." },
+            { char: "ㅁ", dots: [2, 6], original: [1, 5], msg: "첫소리 'ㅁ'(1,5) 진형을 축으로 삼고 [아래쪽으로 한 칸] 수직 평행 이사를 가동하여 받침 'ㅁ'을 채워 보세요." },
+            { char: "ㅂ", dots: [1, 2], original: [4, 5], msg: "첫소리 'ㅂ'(4,5) 장치를 그대로 [왼쪽으로 한 칸] 수평 시프트 기믹을 발동해 받침 'ㅂ'(1,2)을 연성해 보세요." },
+            { char: "ㅅ", dots: [3], original: [6], msg: "첫소리 'ㅅ'(6번)을 수평 라인 그대로 [왼쪽으로 한 칸] 옮겨놓으면 받침 'ㅅ'(3번) 방이 점등됩니다!" },
+            { char: "ㅈ", dots: [1, 3], original: [4, 6], msg: "첫소리 'ㅈ'(4,6) 단계를 [왼쪽으로 한 칸] 밀어내어 받침 'ㅈ'(1,3)의 퍼즐 기믹을 해결해 보세요." },
+            { char: "ㅊ", dots: [2, 3], original: [5, 6], msg: "첫소리 'ㅊ'(5,6) 콤비를 수평 평면상에서 [왼쪽으로 한 칸] 이사 시키면 받침 'ㅊ'(2,3) 해독 완료!" },
+            { char: "ㅋ", dots: [3, 5, 6], original: [1, 2, 4], msg: "첫소리 'ㅋ'을 수직 축을 따라 [아래쪽으로 한 칸] 끌어내려 받침 'ㅋ'의 공간 구성을 확인해 보세요." },
+            { char: "ㅌ", dots: [3, 5, 6], original: [1, 2, 5], msg: "첫소리 'ㅌ' 블록 전체를 [아래쪽으로 한 칸] 정밀하게 강하시켜 받침 'ㅌ' 전용 조약돌을 켜보세요." },
+            { char: "ㅍ", dots: [2, 3, 5], original: [1, 4, 5], msg: "첫소리 'ㅍ' 공간을 기준으로 삼아 [아래쪽으로 한 칸] 수직 드롭다운하여 받침 'ㅍ' 장치를 마감합니다." },
+            { char: "ㅎ", dots: [3, 5, 6], original: [2, 4, 5, 6], msg: "첫소리 'ㅎ'의 거대한 불빛을 [아래쪽으로 한 칸] 수직 이사하여 받침 'ㅎ' 코드를 입력해 보세요." },
+            { char: "ㅇ", dots: [2, 3, 5, 6], isSpecial: true, msg: "★ 중요 예외 고증 규칙: 첫소리 'ㅇ'은 형태가 없어 생략되지만, 받침 'ㅇ'은 절대 생략 금지!\n무조건 [2, 3, 5, 6번] 네 자리를 가득 채워 마킹해야 무사히 우체국을 졸업합니다!" }
         ]
     };
 
-    // 각 단과별 스마트 가이드 퀴즈 뱅크
-    const quizBank = {
+    const islandQuizBank = {
         first: [
-            { q: "첫소리 자음 'ㄷ'의 기준점이 되는 기본 자음은 무엇일까요?", a: ["ㄱ", "ㄹ", "ㅅ", "ㅋ"], correct: 0, hint: "ㄱ(4번점)에 2번을 더하면 ㄷ이 됩니다." },
-            { q: "기본점 5번방을 축으로 삼아 탄생하는 첫소리 기본 자음은?", a: ["ㄴ", "ㅁ", "ㄹ", "ㅈ"], correct: 2, hint: "5번 방 하나만 켜서 시작하는 글자를 찾아보세요." },
-            { q: "첫소리 자음 'ㅈ'과 'ㅊ'은 몇 번 기준점을 공유하고 있나요?", a: ["4번 점", "5번 점", "6번 점", "1,2번 점"], correct: 2, hint: "ㅅ, ㅈ, ㅊ은 모두 6번 점을 베이스로 깔고 시작합니다." },
-            { q: "복합 기준점 1, 2번 방을 베이스로 삼는 자음 계열이 아닌 것은?", a: ["ㅋ", "ㅌ", "ㅎ", "ㄱ"], correct: 2, hint: "ㅎ은 4, 5번 점을 기준점으로 사용합니다." },
-            { q: "4, 5번 기준점에 1번 방을 더하여 완성되는 거센소리 자음은?", a: ["ㅍ", "ㅊ", "ㅌ", "ㅋ"], correct: 0, hint: "ㅁ, ㅂ과 친척인 거센소리 글자입니다." }
+            { q: "첫소리 자음 'ㄷ'의 뼈대가 되는 친척 기준 자음은 무엇일까요?", a: ["ㄱ (4번점)", "ㄹ (5번점)", "ㅅ (6번점)", "ㅋ (1,2번점)"], correct: 0 },
+            { q: "오직 [5번 조약돌] 하나만 켜서 모든 친척 글자의 시작점이 되는 첫소리 자음은?", a: ["ㄴ", "ㅁ", "ㄹ", "ㅂ"], correct: 2 },
+            { q: "첫소리 'ㅅ, ㅈ, ㅊ' 삼형제가 공통으로 바닥에 깔고 있는 소중한 기준점은 몇 번방?", a: ["4번 방", "5번 방", "6번 방", "1,2번 복합방"], correct: 2 },
+            { q: "복합 기준점인 1, 2번 방을 베이스로 공유하지 않는 외톨이 자음은?", a: ["ㅋ", "ㅌ", "ㅎ", "없음"], correct: 2 },
+            { q: "오른쪽 [4, 5번] 기준점에 1번을 충전하여 연성되는 거센소리 자음 원소는?", a: ["ㅍ", "ㅊ", "ㅋ", "ㅌ"], correct: 0 }
         ],
         middle: [
-            { q: "모음 'ㅏ'의 점형태를 좌우로 거울 대칭 뒤집기를 하면 어떤 모음이 될까요?", a: ["ㅓ", "ㅑ", "ㅕ", "ㅗ"], correct: 0, hint: "ㅏ(1,2,6)의 좌우 반대는 ㅓ(2,4,5)입니다." },
-            { q: "전문가 교정 고증: 모음 '요(ㅛ)'의 올바른 점형 번호 조합은?", a: ["1, 4번", "3, 4, 6번", "1, 3, 6번", "2, 4, 6번"], correct: 1, hint: "ㅗ에 3,4번 결합이 일어난 형태를 고르세요." },
-            { q: "모음 'ㅗ'를 위아래로 거울 뒤집기 대칭 연출을 하면 도출되는 모음은?", a: ["ㅛ", "ㅠ", "ㅜ", "ㅡ"], correct: 2, hint: "하늘로 열린 네모가 아래로 뒤집힙니다." },
-            { q: "가로선 모양의 모음 'ㅡ'와 완벽한 수직 직각 대칭을 이루는 모음은?", a: ["ㅣ", "ㅏ", "ㅓ", "ㅔ"], correct: 0, hint: "1, 3, 5번 방에 불이 켜지는 기둥 모양입니다." },
-            { q: "전문가 교정 고증: 모음 '유(ㅠ)'의 정밀 점형 조합 번호는?", a: ["1, 3, 4번", "1, 4, 6번", "3, 4, 5번", "2, 4, 6번"], correct: 1, hint: "ㅜ 베이스에 3,4 결합 원리가 기하학적으로 녹아든 형태입니다." }
+            { q: "모음 'ㅏ'의 6점 형태를 '좌우 거울 대칭' 마법으로 뒤집으면 도출되는 모음은?", a: ["ㅓ", "ㅑ", "ㅕ", "ㅗ"], correct: 0 },
+            { q: "★전문가 고증 반영: 모음 '요(ㅛ)'의 정밀한 한글 점자 번호 조합은?", a: ["1, 4번 방", "3, 4, 6번 방", "1, 3, 6번 방", "2, 4, 6번 방"], correct: 1 },
+            { q: "모음 'ㅗ' 장치를 상하(위아래) 대칭 거울 뒤집기를 수행하면 도출되는 단모음은?", a: ["ㅛ", "ㅠ", "ㅜ", "ㅡ"], correct: 2 },
+            { q: "수평선 모양의 모음 'ㅡ'와 완벽한 직각 마름모 교차 대칭을 이루는 기둥 모양 모음은?", a: ["ㅣ", "ㅏ", "ㅓ", "ㅕ"], correct: 0 },
+            { q: "★전문가 고증 반영: 모음 '유(ㅠ)'의 정확한 표준 6점자 코드는?", a: ["1, 3, 4번", "1, 4, 6번", "3, 4, 5번", "2, 4, 6번"], correct: 1 }
         ],
         last: [
-            { q: "받침 'ㄱ'은 첫소리 'ㄱ'을 어느 방향으로 이동시켜 완성하나요?", a: ["아래쪽으로 한 칸", "왼쪽으로 한 칸", "대각선 위로", "오른쪽으로 한 칸"], correct: 1, hint: "ㄱ, ㄹ, ㅂ, ㅅ, ㅈ, ㅊ은 왼쪽 이동 그룹입니다." },
-            { q: "받침 'ㄴ'은 첫소리 'ㄴ'을 어느 방향으로 이사시켜 완성하나요?", a: ["왼쪽으로 한 칸", "아래쪽으로 한 칸", "위쪽으로 한 칸", "그대로 유지"], correct: 1, hint: "ㄴ, ㄷ, ㅁ, ㅋ, ㅌ, ㅍ, ㅎ은 아래 이동 그룹입니다." },
-            { q: "첫소리일 때는 생략하지만, 받침 규칙에서는 절대 생략하지 않고 2,3,5,6번을 채워야 하는 글자는?", a: ["ㄱ", "ㅎ", "ㅇ", "ㅁ"], correct: 2, hint: "동그라미 모양의 받침 자음입니다." },
-            { q: "첫소리 'ㄷ'(2,5)을 아래로 한 칸 이사시킨 받침 'ㄷ'의 정밀 점형은?", a: ["1, 4번", "2, 5번", "3, 6번", "4, 6번"], correct: 2, hint: "2, 5번에서 한 칸씩 수직 다운을 실행해 보세요." },
-            { q: "다음 중 첫소리 점형에서 '왼쪽으로 한 칸 이동'하는 받침 규칙을 가진 글자는?", a: ["ㅁ", "ㅂ", "ㅌ", "ㅎ"], correct: 1, hint: "ㅂ(4,5)에서 왼쪽 이동하면 받침 ㅂ(1,2)이 됩니다." }
+            { q: "받침 'ㄱ, ㄹ, ㅂ, ㅅ, ㅈ, ㅊ'의 공통점은 첫소리에서 어느 방향으로 칸 이동을 하나요?", a: ["아래쪽으로 한 칸 이사", "왼쪽으로 한 칸 이사", "오른쪽으로 두 칸", "제자리 고정"], correct: 1 },
+            { q: "받침 'ㄴ, ㄷ, ㅁ, ㅋ, ㅌ, ㅍ, ㅎ'의 공통점은 첫소리에서 어느 축 이동을 전개하나요?", a: ["왼쪽 수평 이사", "아래쪽 수직 이사", "위쪽 평행 이사", "전부 생략"], correct: 1 },
+            { q: "★중요 고증: 첫소리일 때는 투명 인간이라 생략하지만, 받침일 때는 절대 생략 못 하는 글자는?", a: ["ㄱ", "ㅎ", "ㅇ", "ㅁ"], correct: 2 },
+            { q: "첫소리 'ㄷ'(2,5)을 아래로 한 칸 완벽하게 강하시킨 받침 'ㄷ'의 정형 코드는?", a: ["1, 4번", "2, 5번", "3, 6번", "4, 6번"], correct: 2 },
+            { q: "첫소리 'ㅂ'(4,5) 점자를 [왼쪽으로 한 칸] 수평 이동 규칙 처리한 올바른 받침 'ㅂ'의 형상은?", a: ["1, 2번 방", "2, 3번 방", "4, 5번 방", "5, 6번 방"], correct: 0 }
         ],
         final: [
-            { q: "[최종 마스터 시험] 첫소리 자음의 '기본점 원리' 중 6번 방을 기준으로 묶인 친척이 아닌 것은?", a: ["ㅅ", "ㅈ", "ㅊ", "ㄷ"], correct: 3, hint: "ㄷ은 4번 점 기준 계열에 속합니다." },
-            { q: "[최종 마스터 시험] 모음의 대칭 원리 중 'ㅡ'와 'ㅣ'가 이루는 구조적 기하학 모양은?", a: ["동그라미 대칭", "네모 대칭", "마름모 직각 대칭", "사선 대칭"], correct: 2, hint: "두 글자가 교차하며 마름모 실루엣을 그려냅니다." },
-            { q: "[최종 마스터 시험] 받침의 이동 규칙 중 '아래쪽으로 한 칸 이동'하는 자음 세트가 아닌 것은?", a: ["ㄴ", "ㄷ", "ㅁ", "ㄹ"], correct: 3, hint: "ㄹ은 왼쪽으로 이동하는 규칙을 가집니다." },
-            { q: "[최종 마스터 시험] 훈맹정음 표준 규칙 상 점형 [1, 4, 6번]이 뜻하는 올바른 모음은?", a: ["야", "요", "유", "여"], correct: 2, hint: "전문가 교정값인 '유'의 정형 비트입니다." },
-            { q: "[최종 마스터 시험] 받침 'ㅇ'의 올바른 6점자 표기 점형 번호는?", a: ["생략한다", "1, 4번 방", "2, 3, 5, 6번 방", "4, 5, 6번 방"], correct: 2, hint: "초성과 달리 종성의 ㅇ은 계란판 4칸을 가득 채웁니다." }
+            { q: "[최종 마스터 평가] 자음 기본점 원리 중 복합점 4, 5번을 기초 뼈대로 사용하는 글자는?", a: ["ㅋ, ㅌ 계열", "ㅍ, ㅎ 계열", "ㅅ, ㅈ, ㅊ 계열", "ㄱ, ㄴ, ㄷ 계열"], correct: 1 },
+            { q: "[최종 마스터 평가] 모음 대칭 원리 중 'ㅡ'와 'ㅣ'가 완벽하게 마주 보며 구현하는 디자인 형상은?", a: ["동그라미 대칭", "네모 대칭", "마름모 직각 대칭", "수평 평행선"], correct: 2 },
+            { q: "[최종 마스터 평가] 받침 이사 규칙 중 '왼쪽으로 한 칸 이동' 법칙이 적용되지 않는 자음은?", a: ["ㄱ", "ㄹ", "ㅂ", "ㄴ"], correct: 3 },
+            { q: "[최종 마스터 평가] 표준 훈맹정음 규격 상 점형 [1, 4, 6번]에 불이 들어오는 단모음은?", a: ["야(ㅑ)", "요(ㅛ)", "유(ㅠ)", "여(ㅕ)"], correct: 2 },
+            { q: "[최종 마스터 평가] 받침 'ㅇ'을 표기할 때 사용해야 하는 올바른 6점자 구멍 번호는?", a: ["형태가 없으므로 생략", "1, 4번 구멍", "2, 3, 5, 6번 구멍", "4, 5, 6번 구멍"], correct: 2 }
         ]
     };
 
-    // 상태 관리 코어 매트릭스
-    let currentSection = '';
-    let currentIdx = 0;
-    let userSelectedDots = [];
-    let stamps = { first: false, middle: false, last: false };
-    let quizMode = 'single'; // 'single' 또는 'final'
-    let quizProgress = 0;
-    let activeQuizSet = [];
-
-    const randomPraises = [
-        "우와, 정말 대단해요! 박두성 선생님이 보셨다면 환하게 웃으셨을 거예요! 🌟",
-        "손끝 감각이 엄청난데요? 완벽하게 암호를 해독했어요! 🎉",
-        "정답이에요! 훈맹정음의 비밀 규칙을 훌륭하게 찾아냈군요! 👏",
-        "띵동댕! 여러분은 이미 멋진 훈맹정음 마스터 탐험대원입니다! 🎖️",
-        "훌륭합니다! 과학적인 한글 점자의 원리를 완벽하게 이해했군요! 👍"
-    ];
+    let activeCamp = '';
+    let expStepIdx = 0;
+    let chosenPebbles = [];
+    let badgePassport = { first: false, middle: false, last: false };
+    let testMode = 'single';
+    let qProgressIdx = 0;
+    let runningQuizArray = [];
 
     function goHome() {
         switchScreen('screen-home');
-        updateStampUI();
+        refreshPassportStamps();
     }
 
-    function switchScreen(screenId) {
+    function switchScreen(id) {
         document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-        document.getElementById(screenId).classList.add('active');
+        document.getElementById(id).classList.add('active');
     }
 
-    function updateStampUI() {
-        if(stamps.first) document.getElementById('stamp-first').classList.add('active');
-        if(stamps.middle) document.getElementById('stamp-middle').classList.add('active');
-        if(stamps.last) document.getElementById('stamp-last').classList.add('active');
+    function refreshPassportStamps() {
+        if(badgePassport.first) document.getElementById('stamp-first').classList.add('active');
+        if(badgePassport.middle) document.getElementById('stamp-middle').classList.add('active');
+        if(badgePassport.last) document.getElementById('stamp-last').classList.add('active');
 
-        if(stamps.first && stamps.middle && stamps.last) {
-            const finalCard = document.getElementById('card-final');
-            finalCard.classList.remove('locked');
-            finalCard.querySelector('.icon').innerText = '🔥';
+        if(badgePassport.first && badgePassport.middle && badgePassport.last) {
+            const finalNode = document.getElementById('final-dungeon-card');
+            finalNode.classList.remove('locked');
+            finalNode.querySelector('.avatar').innerText = '👑';
         }
     }
 
-    // [탐험 구역 세션 가동 엔지니어링]
-    function startSection(section) {
-        currentSection = section;
-        currentIdx = 0;
+    function launchCamp(campKey) {
+        activeCamp = campKey;
+        expStepIdx = 0;
         switchScreen('screen-explore');
-        loadExploreItem();
+        inflateExploreScene();
     }
 
-    function loadExploreItem() {
-        userSelectedDots = [];
-        document.getElementById('btn-next-explore').style.display = 'none';
-        
-        const data = database[currentSection][currentIdx];
-        const titleEl = document.getElementById('explore-title');
-        const guideEl = document.getElementById('explore-guide');
-        const mirrorArea = document.getElementById('mirror-area');
+    function inflateExploreScene() {
+        chosenPebbles = [];
+        document.getElementById('btn-next-step').style.display = 'none';
 
-        // 미러 전용 인터페이스 토글
-        mirrorArea.style.display = (currentSection === 'middle' && data.isMirror) ? 'flex' : 'none';
+        const node = levelDatabase[activeCamp][expStepIdx];
+        const headNode = document.getElementById('exp-headline');
+        const bubbleNode = document.getElementById('exp-bubble');
+        const trackNode = document.getElementById('lever-track');
 
-        titleEl.innerText = `[${getSectionName(currentSection)}] 글자: ${data.char}`;
-        guideEl.innerText = data.msg;
+        trackNode.style.display = (activeCamp === 'middle' && node.isMirror) ? 'flex' : 'none';
+        headNode.innerText = `[${getCampLabel(activeCamp)}] 글자: ${node.char}`;
+        bubbleNode.innerText = node.msg;
 
-        renderBrailleBoard('explore-board', data);
+        drawPebbleInterface('main-pebble-board', node);
     }
 
-    function getSectionName(sec) {
-        if(sec === 'first') return '첫소리 구역';
-        if(sec === 'middle') return '가운뎃소리 모음 구역';
-        return '끝소리 받침 구역';
+    function getCampLabel(key) {
+        if(key === 'first') return '첫소리 구역';
+        if(key === 'middle') return '모음 연구실';
+        return '받침 탐험 교실';
     }
 
-    function renderBrailleBoard(boardId, data) {
+    function drawPebbleInterface(boardId, node) {
         const board = document.getElementById(boardId);
-        board.querySelectorAll('.dot').forEach(dot => {
-            dot.className = 'dot'; // 클래스 초기화
-            const dotId = parseInt(dot.getAttribute('data-id'));
+        board.querySelectorAll('.pebble-dot').forEach(pDot => {
+            pDot.className = 'pebble-dot';
+            const dotId = parseInt(pDot.getAttribute('data-id'));
 
-            // 전문가 가이드: 기본점 잔상 표시 엔진 기동
-            if(data.base && data.base.includes(dotId)) {
-                dot.classList.add('dot-ghost');
-            }
-            if(data.original && data.original.includes(dotId)) {
-                dot.classList.add('dot-ghost'); // 받침 탐험 시 첫소리 잔상 표출
-            }
+            if(node.base && node.base.includes(dotId)) pDot.classList.add('dot-ghost');
+            if(node.original && node.original.includes(dotId)) pDot.classList.add('dot-ghost');
 
-            // 이번에 신규로 추가/터치 가이드가 필요한 타겟 하이라이트 코칭 깜빡이 유도
-            let targetDots = data.dots.filter(d => !(data.base && data.base.includes(d)));
-            if(data.isSpecial) targetDots = data.dots; // 예외처리
-            if(targetDots.includes(dotId)) {
-                dot.classList.add('coach-highlight');
+            let pureTargets = node.dots.filter(v => !(node.base && node.base.includes(v)));
+            if(node.isSpecial || node.isSpecialNotice) pureTargets = node.dots;
+            if(pureTargets.includes(dotId)) {
+                pDot.classList.add('coach-highlight');
             }
         });
     }
 
-    function touchDot(id) {
-        const dotNode = document.querySelector(`#explore-board .dot[data-id="${id}"]`);
-        const data = database[currentSection][currentIdx];
+    function pressPebble(id) {
+        const dotNode = document.querySelector(`#main-pebble-board .pebble-dot[data-id="${id}"]`);
+        const node = levelDatabase[activeCamp][expStepIdx];
 
-        if(userSelectedDots.includes(id)) {
-            userSelectedDots = userSelectedDots.filter(d => d !== id);
+        if(chosenPebbles.includes(id)) {
+            chosenPebbles = chosenPebbles.filter(x => x !== id);
             dotNode.classList.remove('active');
         } else {
-            userSelectedDots.push(id);
+            chosenPebbles.push(id);
             dotNode.classList.add('active');
         }
 
-        // 정답 검증 매트릭스 판독
-        const isMatch = data.dots.length === userSelectedDots.length && data.dots.every(d => userSelectedDots.includes(d));
-        if(isMatch) {
+        const matched = node.dots.length === chosenPebbles.length && node.dots.every(v => chosenPebbles.includes(v));
+        if(matched || node.isSpecialNotice) {
             dotNode.classList.remove('coach-highlight');
-            document.getElementById('explore-guide').innerText = randomPraises[Math.floor(Math.random() * randomPraises.length)];
-            document.getElementById('btn-next-explore').style.display = 'block';
+            document.getElementById('exp-bubble').innerText = "👏 정답이에요! 과학적인 훈맹정음 규칙 암호를 완벽하게 해독했습니다!";
+            document.getElementById('btn-next-step').style.display = 'block';
         }
     }
 
-    // 모음 전용 변형 매직 미러 제어 매트릭스
-    function triggerMirror(type) {
-        const data = database.middle[currentIdx];
-        const guideEl = document.getElementById('explore-guide');
-        
-        if(type === 'lr') {
-            if(data.char === '야') guideEl.innerText = "좌우를 뒤집으면 'ㅏ' 모양으로 반사됩니다! 규칙이 보이시나요?";
-            if(data.char === '어') guideEl.innerText = "좌우를 뒤집으면 'ㅏ'와 쌍둥이 대칭이 구현됩니다!";
-            if(data.char === '여') guideEl.innerText = "좌우를 뒤집으면 'ㅓ' 형태로 이동하게 됩니다!";
+    function pullLever(actionType) {
+        const node = levelDatabase.middle[expStepIdx];
+        const bubble = document.getElementById('exp-bubble');
+
+        if(actionType === 'lr') {
+            bubble.innerText = "↔️ 좌우 반사 레버가 작동하여 거울 대칭 공간으로 불빛 에너지가 슉 이동했습니다!";
         } else {
-            if(data.char === '우') guideEl.innerText = "위아래를 뒤집으면 'ㅗ' 형태로 완벽하게 상하 미러링이 작동합니다!";
-            if(data.char === '유') guideEl.innerText = "위아래를 뒤집으면 'ㅛ' 형태로 상하 반전이 완료됩니다!";
+            bubble.innerText = "↕️ 위아래 반전 레버가 작동하여 상하 거울 대칭 규칙이 연결되었습니다!";
         }
-        
-        // 정답 비트를 시각적으로 자동 점등 제어해주는 연출 자동 발동
-        data.dots.forEach(d => {
-            const node = document.querySelector(`#explore-board .dot[data-id="${d}"]`);
-            if(node) node.classList.add('active');
+
+        node.dots.forEach(d => {
+            const target = document.querySelector(`#main-pebble-board .pebble-dot[data-id="${d}"]`);
+            if(target) target.classList.add('active');
         });
-        userSelectedDots = [...data.dots];
-        document.getElementById('btn-next-explore').style.display = 'block';
+        chosenPebbles = [...node.dots];
+        document.getElementById('btn-next-step').style.display = 'block';
     }
 
-    function nextExploreStep() {
-        currentIdx++;
-        if(currentIdx < database[currentSection].length) {
-            loadExploreItem();
+    function forwardStep() {
+        expStepIdx++;
+        if(expStepIdx < levelDatabase[activeCamp].length) {
+            inflateExploreScene();
         } else {
-            // 탐험 종료 -> 복습 단과 테스트 진입 트랙 연동
-            startQuizMode('single', currentSection);
+            openQuizSession('single', activeCamp);
         }
     }
 
-    // [3단계: 단과 및 마스터 통합 퀴즈 컨트롤 타워]
-    function startQuizMode(mode, sectionKey) {
-        quizMode = mode;
-        currentSection = sectionKey;
-        quizProgress = 0;
-        activeQuizSet = quizBank[sectionKey];
-        
+    function openQuizSession(mode, targetKey) {
+        testMode = mode;
+        activeCamp = targetKey;
+        qProgressIdx = 0;
+        runningQuizArray = islandQuizBank[targetKey];
+
         switchScreen('screen-quiz');
-        loadQuizQuestion();
+        deployQuizUnit();
     }
 
-    function loadQuizQuestion() {
-        const qData = activeQuizSet[quizProgress];
-        document.getElementById('quiz-title').innerText = quizMode === 'final' ? '🥇 최종 마스터 자격시험' : `⚙️ ${getSectionName(currentSection)} 복습 테스트 (${quizProgress + 1}/5)`;
-        document.getElementById('quiz-question').innerText = qData.q;
+    function deployQuizUnit() {
+        const qUnit = runningQuizArray[qProgressIdx];
+        document.getElementById('quiz-header-tag').innerText = testMode === 'final' ? '👑 명예 마스터 종합 자격시험' : `⚙️ 복습 테스트 (${qProgressIdx + 1}/5)`;
+        document.getElementById('quiz-prompt-text').innerText = qUnit.q;
 
-        const optionDiv = document.getElementById('quiz-options');
-        optionDiv.innerHTML = '';
-        
-        qData.a.forEach((opt, idx) => {
-            const btn = document.createElement('div');
-            btn.className = 'quiz-option';
-            btn.innerText = `${idx + 1}. ${opt}`;
-            btn.onclick = () => checkQuizAnswer(idx);
-            optionDiv.appendChild(btn);
+        const container = document.getElementById('quiz-options-place');
+        container.innerHTML = '';
+
+        qUnit.a.forEach((opt, idx) => {
+            const box = document.createElement('div');
+            box.className = 'wood-option';
+            box.innerText = `${idx + 1}. ${opt}`;
+            box.onclick = () => auditAnswer(idx);
+            container.appendChild(box);
         });
 
-        // 힌트 버튼 리스너 바인딩 (누르고 있는 동안에만 정답 6점판에 은은하게 반짝이 불빛 연출 구동)
-        const hintBtn = document.getElementById('btn-quiz-hint');
-        hintBtn.onmousedown = hintBtn.ontouchstart = () => showQuizBrailleHint(true);
-        hintBtn.onmouseup = hintBtn.ontouchend = () => showQuizBrailleHint(false);
-        
-        showQuizBrailleHint(false); // 초기화
+        const hintPad = document.getElementById('hint-pad-trigger');
+        hintPad.onmousedown = hintPad.ontouchstart = () => triggerFireflyHint(true);
+        hintPad.onmouseup = hintPad.ontouchend = () => triggerFireflyHint(false);
+
+        triggerFireflyHint(false);
     }
 
-    function showQuizBrailleHint(show) {
-        const qData = activeQuizSet[quizProgress];
-        const quizBoard = document.getElementById('quiz-board');
-        
-        // 정답 인덱스에 매칭되는 실제 정답 규칙 점 형상 매핑 (간이 데모용 예시 매핑)
-        let simulatedDots = [1, 4]; 
-        if(currentSection === 'first' && quizProgress === 2) simulatedDots = [6];
-        if(currentSection === 'middle' && quizProgress === 1) simulatedDots = [3, 4, 6];
-        if(currentSection === 'last' && quizProgress === 2) simulatedDots = [2, 3, 5, 6];
+    function triggerFireflyHint(active) {
+        const shadowBoard = document.getElementById('quiz-shadow-board');
+        let traceBits = [1, 4];
+        if(activeCamp === 'first' && qProgressIdx === 2) traceBits = [6];
+        if(activeCamp === 'middle' && qProgressIdx === 1) traceBits = [3, 4, 6];
+        if(activeCamp === 'last' && qProgressIdx === 2) traceBits = [2, 3, 5, 6];
 
-        quizBoard.querySelectorAll('.dot').forEach(dot => {
-            const qId = parseInt(dot.getAttribute('data-q'));
-            if(show && simulatedDots.includes(qId)) {
+        shadowBoard.querySelectorAll('.pebble-dot').forEach(dot => {
+            const qCode = parseInt(dot.getAttribute('data-q'));
+            if(active && traceBits.includes(qCode)) {
                 dot.classList.add('active');
             } else {
                 dot.classList.remove('active');
@@ -757,68 +632,155 @@
         });
     }
 
-    function checkQuizAnswer(selectedIdx) {
-        const qData = activeQuizSet[quizProgress];
-        if(selectedIdx === qData.correct) {
-            alert("정답입니다! 명석하군요.");
-            quizProgress++;
-            if(quizProgress < 5) {
-                loadQuizQuestion();
+    function auditAnswer(userChoice) {
+        const qUnit = runningQuizArray[qProgressIdx];
+        if(userChoice === qUnit.correct) {
+            alert("정답입니다! 훌륭해요.");
+            qProgressIdx++;
+            if(qProgressIdx < 5) {
+                deployQuizUnit();
             } else {
-                finishQuizSet();
+                concludeQuizCourse();
             }
         } else {
-            alert("오답입니다! 힌트 보기 버튼을 눌러 점자판의 실루엣을 확인해 보세요.");
+            alert("오답입니다! '반딧불이 힌트' 버튼을 누르고 있는 동안 정답 실루엣을 확인할 수 있습니다.");
         }
     }
 
-    function finishQuizSet() {
-        if(quizMode === 'single') {
-            stamps[currentSection] = true;
-            alert(`🎉 축하합니다! ${getSectionName(currentSection)} 탐험 스탬프를 획득하셨습니다!`);
+    function concludeQuizCourse() {
+        if(testMode === 'single') {
+            badgePassport[activeCamp] = true;
+            alert("🎉 축하합니다! 해당 탐험 구역 스탬프를 획득하셨습니다!");
             goHome();
         } else {
-            // 마스터 최종 합격 -> 수료 상장 모달 발급식 거행
-            document.getElementById('modal-cert').classList.add('active');
+            document.getElementById('modal-island-passport').classList.add('active');
         }
     }
 
-    // [4단계: 스탬프 락 스크리닝 및 최종 마스터 암호 해독실]
-    function startFinalRoom() {
-        if(stamps.first && stamps.middle && stamps.last) {
-            startQuizMode('final', 'final');
+    function launchFinalCastle() {
+        if(badgePassport.first && badgePassport.middle && badgePassport.last) {
+            openQuizSession('final', 'final');
         } else {
-            alert("🔒 아직 열리지 않았어요! 세 가지 탐험 구역을 모두 마쳐 스탬프 3개를 모아주세요.");
+            alert("🔒 아직 문이 열리지 않았어요! 세 가지 관문을 모두 돌파해 스탬프 3개를 모아주세요!");
         }
     }
 
-    function closeCertModal() {
-        document.getElementById('modal-cert').classList.remove('active');
+    function dismissPassport() {
+        document.getElementById('modal-island-passport').classList.remove('active');
         goHome();
     }
 
-    // 최종 상장 수료증 이미지 갤러리 다운로드 시뮬레이션 인터랙션
-    function downloadCert() {
-        const name = document.getElementById('student-name').value.trim();
-        if(!name) {
-            alert("상장에 명시할 이름을 입력해 주세요!");
+    // 🎨 [혁신 엔진] HTML5 Canvas API를 사용해 오프라인 렌더링 후 고해상도 PNG 이미지로 저장하는 스크립트
+    function generateAndSaveCertificate() {
+        const nickname = document.getElementById('islander-name').value.trim();
+        if(!nickname) {
+            alert("주민증에 새겨질 대원의 이름을 입력해 주세요!");
             return;
         }
+
+        // 1. 가상의 캔버스 생성 (고해상도 A4 비율 매핑: 1200x850)
+        const canvas = document.createElement('canvas');
+        canvas.width = 1200;
+        canvas.height = 850;
+        const ctx = canvas.getContext('2d');
+
+        // 2. 배경 채우기 (고급스러운 미색 크림톤 무드)
+        ctx.fillStyle = '#fffdf9';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // 3. 은은한 배경 격자/무늬 장치 (위조 방지용 감성)
+        ctx.strokeStyle = 'rgba(141, 110, 99, 0.03)';
+        ctx.lineWidth = 2;
+        for (let i = 0; i < canvas.width; i += 40) {
+            ctx.beginPath(); ctx.moveTo(i, 0); ctx.lineTo(i, canvas.height); ctx.stroke();
+        }
+        for (let j = 0; j < canvas.height; j += 40) {
+            ctx.beginPath(); ctx.moveTo(0, j); ctx.lineTo(canvas.width, j); ctx.stroke();
+        }
+
+        // 4. 황금빛 격식 있는 더블 테두리(Double Border) 드로잉
+        ctx.strokeStyle = '#cfb53b'; 
+        ctx.lineWidth = 12;
+        ctx.strokeRect(30, 30, canvas.width - 60, canvas.height - 60);
+        ctx.lineWidth = 4;
+        ctx.strokeRect(50, 50, canvas.width - 100, canvas.height - 100);
+
+        // 5. 텍스트 정렬 설정
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#3e2723'; // 깊은 나무 숲 질감 브라운
+
+        // 타이틀 인쇄
+        ctx.font = 'bold 50px "Malgun Gothic"';
+        ctx.fillText('훈맹정음 명예 주민증', canvas.width / 2, 160);
+
+        // 서브 헤더 인쇄
+        ctx.font = 'bold 22px "Malgun Gothic"';
+        ctx.fillStyle = '#8d6e63';
+        ctx.fillText('✨ 한글 점자 비밀 탐험대 명예의 전당 ✨', canvas.width / 2, 220);
+
+        // 구분선 그리기
+        ctx.strokeStyle = '#d7ccc8';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2 - 150, 250);
+        ctx.lineTo(canvas.width / 2 + 150, 250);
+        ctx.stroke();
+
+        // 성명 인쇄
+        ctx.textAlign = 'left';
+        ctx.fillStyle = '#3e2723';
+        ctx.font = 'bold 32px "Malgun Gothic"';
+        ctx.fillText(`성 명: ${nickname} 탐험대원`, 120, 340);
+
+        // 본문 내용 자동 줄바꿈(Word Wrap) 시스템 가동
+        ctx.font = '24px "Malgun Gothic"';
+        ctx.fillStyle = '#5d4037';
+        const msg = "위 사람은 송암 박두성 선생님이 창제한 우리말 점자 '훈맹정음'의 위대한 첫소리 기본점 원리, 가운뎃소리 모음 차원 대칭 뒤집기 기믹, 그리고 끝소리 받침의 수평·수직 위치 이동의 비밀 규칙을 완벽하게 조사하고 최종 종합 자격시험을 최고 성적으로 통과하였으므로 명예 마스터 주민으로 임명하며 본 증서를 수여합니다.";
         
-        // 파일 다운로드 브라우저 가상 노드 생성기 작동
-        const textData = `[훈맹정음 마스터 상장]\n성명: ${name}\n\n${document.getElementById('cert-print-zone').innerText}\n\n- 훈맹정음 탐험대 본부 기독 -`;
-        const blob = new Blob([textData], { type: "text/plain;charset=utf-8" });
-        const link = document.createElement("a");
-        link.href = URL.createObjectURL(blob);
-        link.download = `${name}_훈맹정음_수료증.txt`;
-        link.click();
+        const maxWidth = canvas.width - 240;
+        const words = msg.split(' ');
+        let line = '';
+        let y = 420;
+        const lineHeight = 45;
+
+        for (let n = 0; n < words.length; n++) {
+            let testLine = line + words[n] + ' ';
+            let metrics = ctx.measureText(testLine);
+            if (metrics.width > maxWidth && n > 0) {
+                ctx.fillText(line, 120, y);
+                line = words[n] + ' ';
+                y += lineHeight;
+            } else {
+                line = testLine;
+            }
+        }
+        ctx.fillText(line, 120, y);
+
+        // 하단 날짜 및 발행처 인쇄
+        ctx.textAlign = 'center';
+        ctx.fillStyle = '#8d6e63';
+        ctx.font = 'bold 24px "Malgun Gothic"';
         
-        alert(`${name} 대원님의 명예 수료증이 갤러리/파일 폴더에 안전하게 저장되었습니다!`);
-        closeCertModal();
+        const today = new Date();
+        const dateString = `${today.getFullYear()}년 ${today.getMonth() + 1}월 ${today.getDate()}일`;
+        ctx.fillText(dateString, canvas.width / 2, 690);
+
+        ctx.fillStyle = '#3e2723';
+        ctx.font = 'bold 30px "Malgun Gothic"';
+        ctx.fillText('훈맹정음 비밀 탐험대 본부', canvas.width / 2, 750);
+
+        // 6. 이미지 저장 및 브라우저 다운로드 트래픽 유도
+        const imageURL = canvas.toDataURL('image/png');
+        const downloadLink = document.createElement('a');
+        downloadLink.href = imageURL;
+        downloadLink.download = `${nickname}_훈맹정음_명예주민증.png`;
+        downloadLink.click();
+
+        alert(`🏅 축하합니다! ${nickname} 대원님의 명예 주민증이 고해상도 상장 이미지(PNG)로 갤러리/다운로드 폴더에 안전하게 저장되었습니다!`);
+        dismissPassport();
     }
 
-    // 초기 가동 런타임
-    updateStampUI();
+    goHome();
 </script>
 </body>
 </html>
