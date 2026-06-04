@@ -9,11 +9,11 @@ export default defineConfig({
     minify: 'esbuild',
     rollupOptions: {
       output: {
-        format: 'es',
-        entryFileNames: `assets/[name].js`,
-        chunkFileNames: `assets/[name].js`,
-        assetFileNames: `assets/[name].[ext]`,
-      },
-    },
-  },
+        format: 'esm',
+        entryFileNames: 'assets/[name].[hash].js',
+        chunkFileNames: 'assets/[name].[hash].js',
+        assetFileNames: 'assets/[name].[hash].[ext]'
+      }
+    }
+  }
 })
