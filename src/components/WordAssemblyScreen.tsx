@@ -1,7 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { wordAssemblyDatabase } from '../data/wordAssembly';
-import type { AssemblyWord } from '../data/wordAssembly';
 import PebbleBoard from './PebbleBoard';
+
+// 이 화면만을 위한 전용 타입 선언 (외부 의존성 제거 및 충돌 방지)
+interface AssemblyStep {
+    letter: string;
+    part: 'first' | 'middle' | 'last';
+    partName: string;
+    dots: number[];
+    msg: string;
+}
 
 interface WordAssemblyScreenProps {
     onGoHome: () => void;
@@ -17,12 +25,13 @@ const WordAssemblyScreen: React.FC<WordAssemblyScreenProps> = ({ onGoHome, onCom
     const [showConfirm, setShowConfirm] = useState(false);
     const [errorDots, setErrorDots] = useState<number[]>([]);
 
-    const currentWord: AssemblyWord = wordAssemblyDatabase[wordIdx];
-    const currentNode = currentWord.steps[stepIdx];
+    const currentWord = wordAssemblyDatabase[wordIdx];
+    // AssemblyStep 타입을 명시적으로 적용하여 'char' 속성 누락으로 인한 빌드 에러 방지
+    const currentNode = currentWord.steps[stepIdx] as AssemblyStep;
 
     // Web Audio API를 이용한 내장 신호음 생성 함수
     const playTone = (type: 'success' | 'failure' | 'click') => {
-        const AudioContext = window.AudioContext || (window as any).webkitAudioContext;
+        const AudioContext = (window as any).AudioContext || (window as any).webkitAudioContext;
         if (!AudioContext) return;
         
         const ctx = new AudioContext();
@@ -75,7 +84,7 @@ const WordAssemblyScreen: React.FC<WordAssemblyScreenProps> = ({ onGoHome, onCom
     }, [wordIdx, stepIdx, currentNode]);
 
     const handlePressPebble = (id: number) => {
-        if (showNext) return; // 이미 정답을 맞췄으면 클릭 무시
+        if (showNext) return;
 
         const isCorrectTarget = currentNode.dots.includes(id);
 
@@ -94,7 +103,6 @@ const WordAssemblyScreen: React.FC<WordAssemblyScreenProps> = ({ onGoHome, onCom
         }
         setChosenPebbles(newPebbles);
 
-        // 정답 체크
         const matched = currentNode.dots.length === newPebbles.length && 
                         currentNode.dots.every(v => newPebbles.includes(v));
         
@@ -251,10 +259,11 @@ const WordAssemblyScreen: React.FC<WordAssemblyScreenProps> = ({ onGoHome, onCom
                         </div>
                     </div>
                 </div>
+                {/* 우측 점판 영역: 완벽한 정중앙 정렬 (flex items-center justify-center) */}
                 <div className="right-panel" style={{ display: 'flex', flex: 1, alignItems: 'center', justifyContent: 'center', height: '100%' }}>
                     <div style={{ margin: 0, padding: 0 }}>
                         <PebbleBoard
-                            node={{...currentNode, base: showHint ? currentNode.dots : []}}
+                            node={{ char: currentNode.letter, dots: currentNode.dots, base: showHint ? currentNode.dots : [] }}
                             chosenPebbles={chosenPebbles}
                             onPressPebble={handlePressPebble}
                             showHint={showHint}
